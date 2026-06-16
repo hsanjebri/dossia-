@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DosyaProcedureImport",
+  "type": "object",
+  "required": [
+    "titleFr",
+    "titleAr",
+    "ministry",
+    "category",
+    "difficulty",
+    "sourceUrl"
+  ],
+  "properties": {
+    "slug": { "type": "string" },
+    "titleFr": { "type": "string", "minLength": 1 },
+    "titleAr": { "type": "string", "minLength": 1 },
+    "titleTn": { "type": "string" },
+    "descriptionFr": { "type": "string" },
+    "descriptionAr": { "type": "string" },
+    "ministry": { "type": "string", "minLength": 1 },
+    "category": {
+      "type": "string",
+      "enum": ["CIVIL_STATUS", "BUSINESS", "VEHICLES", "SOCIAL", "EDUCATION", "TAX"]
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["EASY", "MODERATE", "COMPLEX"]
+    },
+    "deliveryMode": { "type": "string" },
+    "processingTime": { "type": "string" },
+    "fees": { "type": "string" },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "sourceReference": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["DRAFT", "PUBLISHED", "ARCHIVED"]
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["sortOrder", "titleFr", "titleAr"],
+        "properties": {
+          "sortOrder": { "type": "integer" },
+          "titleFr": { "type": "string" },
+          "titleAr": { "type": "string" },
+          "descriptionFr": { "type": "string" },
+          "descriptionAr": { "type": "string" }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stepNumber", "titleFr", "titleAr"],
+        "properties": {
+          "stepNumber": { "type": "integer" },
+          "titleFr": { "type": "string" },
+          "titleAr": { "type": "string" },
+          "descriptionFr": { "type": "string" },
+          "descriptionAr": { "type": "string" }
+        }
+      }
+    },
+    "offices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "address"],
+        "properties": {
+          "name": { "type": "string" },
+          "address": { "type": "string" },
+          "city": { "type": "string" },
+          "governorate": { "type": "string" },
+          "hoursFr": { "type": "string" },
+          "hoursAr": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" }
+        }
+      }
+    },
+    "relatedProcedureSlugs": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

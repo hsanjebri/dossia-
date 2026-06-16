@@ -1,0 +1,5 @@
+# Copy to application-local.yml (gitignored) for local overrides.
+spring:
+  datasource:
+    username: postgres
+    password: your-postgres-password-here

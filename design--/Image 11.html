@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Noto+Kufi+Arabic:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chat-container {
+            height: calc(100vh - 64px);
+        }
+        @keyframes slideInUp {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .message-spring {
+            animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+        .typing-dot {
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E2D2B8;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#446274",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e7e2da",
+                        "primary-fixed": "#ffdeab",
+                        "text-main": "#1C1C1C",
+                        "on-secondary-container": "#4a687a",
+                        "tertiary-fixed": "#ffdf9f",
+                        "surface-container-high": "#ece8e0",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f8f3eb",
+                        "primary": "#7e5700",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fef9f1",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#261a00",
+                        "text-muted": "#6B6156",
+                        "surface-dim": "#ded9d2",
+                        "on-primary-container": "#462f00",
+                        "on-background": "#1d1c17",
+                        "on-secondary-fixed": "#001e2c",
+                        "on-tertiary-container": "#433000",
+                        "outline": "#827564",
+                        "secondary-container": "#c7e7fc",
+                        "border-gold": "rgba(200, 146, 42, 0.3)",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#504536",
+                        "on-primary-fixed": "#281900",
+                        "secondary-fixed-dim": "#abcbdf",
+                        "surface-tint": "#7e5700",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#c7e7fc",
+                        "inverse-primary": "#f8bc51",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "on-surface": "#1d1c17",
+                        "on-primary-fixed-variant": "#5f4100",
+                        "inverse-surface": "#32302b",
+                        "tertiary": "#795900"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "xxl": "64px",
+                        "container-max": "1200px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "arabic-body": ["Noto Kufi Arabic"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Top Navigation Bar (Shared Component) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-gold shadow-sm">
+<div class="flex justify-between items-center px-lg py-sm max-w-container-max mx-auto h-16">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">Dosya دوسيا</span>
+</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="text-text-muted hover:text-primary transition-colors font-body-md" href="#">Home</a>
+<a class="text-text-muted hover:text-primary transition-colors font-body-md" href="#">How it works</a>
+<a class="text-text-muted hover:text-primary transition-colors font-body-md" href="#">Features</a>
+<a class="text-text-muted hover:text-primary transition-colors font-body-md" href="#">FAQ</a>
+</nav>
+<div class="flex items-center gap-md">
+<span class="text-primary font-body-md cursor-pointer">AR/FR</span>
+<button class="bg-primary text-white px-md py-xs rounded-xl font-bold active:scale-95 duration-200">Try for free</button>
+</div>
+</div>
+</header>
+<main class="flex pt-16 chat-container overflow-hidden">
+<!-- Sidebar: Conversations -->
+<aside class="hidden md:flex flex-col w-80 border-l border-gold bg-surface-container-low p-md">
+<button class="flex items-center justify-center gap-sm bg-primary text-white w-full py-md rounded-xl font-bold shadow-lg hover:bg-primary-container transition-all active:scale-95 mb-lg">
+<span class="material-symbols-outlined">add</span>
+<span class="font-arabic-body">محادثة جديدة</span>
+</button>
+<div class="flex-1 overflow-y-auto custom-scrollbar space-y-sm">
+<p class="text-text-muted text-xs font-bold uppercase tracking-widest px-sm mb-xs">الأخيرة</p>
+<div class="p-md bg-white border border-gold rounded-xl cursor-pointer hover:shadow-sm transition-all flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary">chat_bubble</span>
+<div class="flex-1 overflow-hidden">
+<p class="font-arabic-body text-sm truncate">تجديد بطاقة التعريف الوطنية</p>
+<p class="text-xs text-text-muted">منذ ساعتين</p>
+</div>
+</div>
+<div class="p-md hover:bg-white/50 rounded-xl cursor-pointer transition-all flex items-start gap-sm">
+<span class="material-symbols-outlined text-text-muted">chat_bubble</span>
+<div class="flex-1 overflow-hidden">
+<p class="font-arabic-body text-sm truncate">استخراج مضموم ولادة</p>
+<p class="text-xs text-text-muted">أمس</p>
+</div>
+</div>
+<div class="p-md hover:bg-white/50 rounded-xl cursor-pointer transition-all flex items-start gap-sm">
+<span class="material-symbols-outlined text-text-muted">chat_bubble</span>
+<div class="flex-1 overflow-hidden">
+<p class="font-arabic-body text-sm truncate">وثائق جواز السفر</p>
+<p class="text-xs text-text-muted">3 أيام مضت</p>
+</div>
+</div>
+</div>
+<div class="mt-auto border-t border-gold/50 pt-md">
+<div class="flex items-center gap-md p-sm hover:bg-white rounded-lg cursor-pointer transition-all">
+<div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-bold text-sm">أحمد بن علي</p>
+<p class="text-xs text-text-muted">حساب مواطن</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Chat Area -->
+<section class="flex-1 flex flex-col relative bg-surface-bright">
+<!-- Messages Display -->
+<div class="flex-1 overflow-y-auto p-lg space-y-lg custom-scrollbar" id="chat-messages">
+<!-- Welcome State -->
+<div class="max-w-2xl mx-auto text-center mt-xl space-y-md">
+<div class="w-16 h-16 bg-primary text-white rounded-full mx-auto flex items-center justify-center shadow-xl mb-md">
+<span class="text-3xl font-bold">D</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary font-arabic-body">مرحباً بك في دوسيا</h2>
+<p class="text-text-muted font-arabic-body max-w-sm mx-auto">أنا مساعدك الإداري الذكي. كيف يمكنني مساعدتك في الإجراءات الإدارية التونسية اليوم؟</p>
+</div>
+<!-- Demo Exchange: User -->
+<div class="flex justify-end message-spring">
+<div class="bg-primary text-white p-md rounded-2xl rounded-tr-none max-w-md shadow-md">
+<p class="font-arabic-body leading-relaxed">كيفاش نجم نجدد بطاقة التعريف الوطنية متاعي؟</p>
+</div>
+</div>
+<!-- Demo Exchange: Dosya Response -->
+<div class="flex justify-start items-start gap-md message-spring" style="animation-delay: 0.3s">
+<div class="w-8 h-8 rounded-full bg-primary flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">D</div>
+<div class="space-y-md w-full max-w-xl">
+<div class="bg-white border border-gold p-md rounded-2xl rounded-tl-none shadow-sm">
+<p class="font-arabic-body leading-relaxed mb-md">لتجديد بطاقة التعريف الوطنية في تونس، إليك قائمة الوثائق المطلوبة:</p>
+<!-- Animated Checklist Card -->
+<div class="bg-surface-container-low border border-gold/50 rounded-xl p-md space-y-sm">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-success" data-weight="fill">check_circle</span>
+<span class="font-arabic-body text-sm">مطلب الحصول على بطاقة تعريف (من مركز الشرطة)</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-success" data-weight="fill">check_circle</span>
+<span class="font-arabic-body text-sm">البطاقة القديمة (أو شهادة ضياع)</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-success" data-weight="fill">check_circle</span>
+<span class="font-arabic-body text-sm">3 صور شمسية حديثة (خلفية بيضاء)</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-outline">circle</span>
+<span class="font-arabic-body text-sm">وصل خلاص معلوم الطابع الجبائي (3 دنانير)</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-outline">circle</span>
+<span class="font-arabic-body text-sm">شهادة إقامة لا يتجاوز تاريخ تسليمها 3 أشهر</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Typing Indicator -->
+<div class="flex justify-start items-center gap-sm py-md opacity-60">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex-shrink-0"></div>
+<div class="flex gap-1">
+<span class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></span>
+<span class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></span>
+<span class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></span>
+</div>
+</div>
+</div>
+<!-- Interaction Layer -->
+<div class="border-t border-gold bg-white p-lg">
+<div class="max-w-4xl mx-auto space-y-md">
+<!-- Quick-start Chips -->
+<div class="flex flex-wrap gap-sm justify-center mb-md">
+<button class="px-md py-xs rounded-full border border-gold text-primary font-arabic-body text-sm hover:bg-primary-fixed transition-colors">
+                            تجديد بطاقة التعريف
+                        </button>
+<button class="px-md py-xs rounded-full border border-gold text-primary font-arabic-body text-sm hover:bg-primary-fixed transition-colors">
+                            استخراج شهادة الميلاد
+                        </button>
+<button class="px-md py-xs rounded-full border border-gold text-primary font-arabic-body text-sm hover:bg-primary-fixed transition-colors">
+                            إجراءات جواز السفر
+                        </button>
+<button class="px-md py-xs rounded-full border border-gold text-primary font-arabic-body text-sm hover:bg-primary-fixed transition-colors">
+                            تسجيل عقد كراء
+                        </button>
+</div>
+<!-- Input Bar -->
+<div class="flex items-center gap-md bg-surface-container-lowest border border-gold p-sm rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+<button class="p-md text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-arabic-body text-right" placeholder="اكتب سؤالك هنا..." type="text"/>
+<button class="p-md text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="bg-primary text-white p-md rounded-xl flex items-center justify-center hover:bg-primary-container transition-all active:scale-95">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<p class="text-center text-[10px] text-text-muted uppercase font-bold tracking-widest opacity-50">
+                        DOSYA AI — SECURE GOVERNMENT ASSISTANT
+                    </p>
+</div>
+</div>
+</section>
+</main>
+<!-- Visual Accents (Pattern) -->
+<div class="fixed bottom-0 left-0 w-64 h-64 pointer-events-none opacity-[0.03]" style="background-image: radial-gradient(#7e5700 1px, transparent 1px); background-size: 20px 20px;"></div>
+<script>
+        // Micro-interactions for the input field
+        const input = document.querySelector('input');
+        const sendBtn = document.querySelector('.bg-primary.p-md');
+        
+        input.addEventListener('focus', () => {
+            input.parentElement.classList.add('border-primary');
+        });
+        
+        input.addEventListener('blur', () => {
+            input.parentElement.classList.remove('border-primary');
+        });
+
+        // Basic send simulation
+        sendBtn.addEventListener('click', () => {
+            if(input.value.trim() !== "") {
+                const chatContainer = document.getElementById('chat-messages');
+                const userMsg = document.createElement('div');
+                userMsg.className = "flex justify-end message-spring";
+                userMsg.innerHTML = `
+                    <div class="bg-primary text-white p-md rounded-2xl rounded-tr-none max-w-md shadow-md">
+                        <p class="font-arabic-body leading-relaxed">${input.value}</p>
+                    </div>
+                `;
+                chatContainer.appendChild(userMsg);
+                input.value = "";
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        });
+
+        // Enter key support
+        input.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') sendBtn.click();
+        });
+    </script>
+</body></html>

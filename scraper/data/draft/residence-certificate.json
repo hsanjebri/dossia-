@@ -1,0 +1,58 @@
+{
+  "slug": "residence-certificate",
+  "titleFr": "Certificat de Résidence",
+  "titleAr": "شهادة إقامة",
+  "titleTn": "شهادة سكنى",
+  "descriptionFr": "Document attestant l'adresse de résidence officielle du demandeur.",
+  "descriptionAr": "وثيقة تثبت عنوان الإقامة الرسمي لصاحب الطلب.",
+  "ministry": "Ministry of Interior",
+  "category": "CIVIL_STATUS",
+  "difficulty": "EASY",
+  "deliveryMode": "Walk-in",
+  "processingTime": "Same day",
+  "fees": "Gratuit",
+  "sourceUrl": "https://www.services.tn",
+  "sourceReference": "Civil status — residence certificate",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "Carte d'identité nationale",
+      "titleAr": "بطاقة التعريف الوطنية",
+      "descriptionFr": "Original et copie.",
+      "descriptionAr": "الأصل ونسخة."
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "Facture STEG ou SONEDE récente",
+      "titleAr": "فاتورة كهرباء أو ماء حديثة",
+      "descriptionFr": "Datée de moins de 3 mois, à l'adresse demandée.",
+      "descriptionAr": "لا يتجاوز تاريخها 3 أشهر، بالعنوان المطلوب."
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "Rassembler les pièces",
+      "titleAr": "جمع الوثائق",
+      "descriptionFr": "CIN et justificatif de domicile récent.",
+      "descriptionAr": "بطاقة التعريف وإثبات السكن الحديث."
+    },
+    {
+      "stepNumber": 2,
+      "titleFr": "Demande au commissariat",
+      "titleAr": "الطلب لدى مركز الشرطة",
+      "descriptionFr": "Déposer la demande au poste de police de votre secteur.",
+      "descriptionAr": "تقديم الطلب بمركز الشرطة التابع للمنطقة."
+    },
+    {
+      "stepNumber": 3,
+      "titleFr": "Retrait du certificat",
+      "titleAr": "استلام الشهادة",
+      "descriptionFr": "Le certificat est généralement délivré le jour même.",
+      "descriptionAr": "تُسلّم الشهادة عادة في نفس اليوم."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": ["national-id-card-renewal"]
+}

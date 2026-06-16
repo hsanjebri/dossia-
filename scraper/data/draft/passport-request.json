@@ -1,0 +1,88 @@
+{
+  "slug": "passport-request",
+  "titleFr": "Demande de Passeport Biométrique",
+  "titleAr": "طلب جواز سفر بيومتري",
+  "titleTn": "طلب جواز سفر",
+  "descriptionFr": "Délivrance ou renouvellement du passeport biométrique tunisien pour les citoyens tunisiens.",
+  "descriptionAr": "إصدار أو تجديد جواز السفر البيومتري التونسي للمواطنين التونسيين.",
+  "ministry": "Ministry of Interior",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "Walk-in",
+  "processingTime": "15-20 business days",
+  "fees": "25.000 TND",
+  "sourceUrl": "https://www.interieur.gov.tn",
+  "sourceReference": "Interior Ministry — biometric passport",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "Carte d'identité nationale en cours de validité",
+      "titleAr": "بطاقة تعريف وطنية سارية المفعول",
+      "descriptionFr": "Original et copie.",
+      "descriptionAr": "الأصل ونسخة."
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "Formulaire de demande de passeport",
+      "titleAr": "مطلب الحصول على جواز سفر",
+      "descriptionFr": "À retirer au commissariat ou en ligne selon les services disponibles.",
+      "descriptionAr": "يُسحب من مركز الشرطة أو عبر الإنترنت حسب الخدمات المتاحة."
+    },
+    {
+      "sortOrder": 3,
+      "titleFr": "Photographies d'identité (x2)",
+      "titleAr": "صورتان شمسيتان",
+      "descriptionFr": "Fond clair, format passeport.",
+      "descriptionAr": "خلفية فاتحة، مقاس جواز السفر."
+    },
+    {
+      "sortOrder": 4,
+      "titleFr": "Timbre fiscal",
+      "titleAr": "وصل خلاص معلوم الطابع الجبائي",
+      "descriptionFr": "Montant selon le type de passeport (vérifier au guichet).",
+      "descriptionAr": "المبلغ حسب نوع جواز السفر (يُتحقق منه لدى المكتب)."
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "Préparer le dossier",
+      "titleAr": "تحضير الملف",
+      "descriptionFr": "Rassembler tous les documents requis et les copies.",
+      "descriptionAr": "جمع جميع الوثائق المطلوبة ونسخها."
+    },
+    {
+      "stepNumber": 2,
+      "titleFr": "Dépôt au commissariat",
+      "titleAr": "الإيداع لدى مركز الشرطة",
+      "descriptionFr": "Se présenter au commissariat du lieu de résidence avec le dossier complet.",
+      "descriptionAr": "الحضور إلى مركز الشرطة بمكان الإقامة مع الملف الكامل."
+    },
+    {
+      "stepNumber": 3,
+      "titleFr": "Prise d'empreintes et photo",
+      "titleAr": "أخذ البصمة والصورة",
+      "descriptionFr": "Le service capture les données biométriques.",
+      "descriptionAr": "تسجيل البيانات البيومترية لدى المصلحة."
+    },
+    {
+      "stepNumber": 4,
+      "titleFr": "Retrait du passeport",
+      "titleAr": "استلام جواز السفر",
+      "descriptionFr": "Présenter le récépissé à la date indiquée.",
+      "descriptionAr": "الحضور بوصل الإيداع في التاريخ المحدد."
+    }
+  ],
+  "offices": [
+    {
+      "name": "Commissariat central",
+      "address": "Rue de la Liberté, Tunis",
+      "city": "Tunis",
+      "governorate": "Tunis",
+      "hoursFr": "Lun-Ven: 08:00 – 16:00",
+      "hoursAr": "الإثنين-الجمعة: 08:00 – 16:00"
+    }
+  ],
+  "relatedProcedureSlugs": ["national-id-card-renewal"]
+}

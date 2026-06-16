@@ -1,0 +1,60 @@
+{
+  "slug": "timbre-fiscal",
+  "titleFr": "Achat de Timbre Fiscal",
+  "titleAr": "شراء طابع جبائي",
+  "titleTn": "شراء طابع",
+  "descriptionFr": "Acquisition du timbre fiscal requis pour diverses démarches administratives.",
+  "descriptionAr": "اقتناء الطابع الجبائي المطلوب لعدة إجراءات إدارية.",
+  "ministry": "Ministry of Finance",
+  "category": "TAX",
+  "difficulty": "EASY",
+  "deliveryMode": "Walk-in",
+  "processingTime": "Instantané",
+  "fees": "Variable (selon montant)",
+  "sourceUrl": "https://www.finances.gov.tn",
+  "sourceReference": "Finance Ministry — fiscal stamp",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "Carte d'identité nationale",
+      "titleAr": "بطاقة التعريف الوطنية",
+      "descriptionFr": "Pour identification au guichet.",
+      "descriptionAr": "للتعريف لدى المكتب."
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "Identifier le montant requis",
+      "titleAr": "تحديد المبلغ المطلوب",
+      "descriptionFr": "Vérifier le montant du timbre sur la liste des pièces de votre démarche.",
+      "descriptionAr": "التحقق من قيمة الطابع في قائمة وثائق الإجراء."
+    },
+    {
+      "stepNumber": 2,
+      "titleFr": "Se rendre à la recette des finances",
+      "titleAr": "الذهاب إلى مكتب الخزينة",
+      "descriptionFr": "Payer au guichet de la recette des finances ou bureau postal habilité.",
+      "descriptionAr": "الخلاص لدى مكتب الخزينة أو مكتب بريد مخول."
+    },
+    {
+      "stepNumber": 3,
+      "titleFr": "Conserver le reçu",
+      "titleAr": "الاحتفاظ بالوصل",
+      "descriptionFr": "Joindre le reçu de paiement du timbre à votre dossier administratif.",
+      "descriptionAr": "إرفاق وصل خلاص الطابع بملف الإجراء الإداري."
+    }
+  ],
+  "offices": [
+    {
+      "name": "Recette des finances",
+      "address": "Centre-ville",
+      "city": "Tunis",
+      "governorate": "Tunis",
+      "hoursFr": "Lun-Ven: 08:00 – 16:30",
+      "hoursAr": "الإثنين-الجمعة: 08:00 – 16:30"
+    }
+  ],
+  "relatedProcedureSlugs": ["national-id-card-renewal", "passport-request"]
+}

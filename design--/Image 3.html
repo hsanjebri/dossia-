@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;600&amp;family=Noto+Kufi+Arabic:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#446274",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#e7e2da",
+                    "primary-fixed": "#ffdeab",
+                    "text-main": "#1C1C1C",
+                    "on-secondary-container": "#4a687a",
+                    "tertiary-fixed": "#ffdf9f",
+                    "surface-container-high": "#ece8e0",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f8f3eb",
+                    "primary": "#7e5700",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#fef9f1",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#261a00",
+                    "text-muted": "#6B6156",
+                    "surface-dim": "#ded9d2",
+                    "on-primary-container": "#462f00",
+                    "on-background": "#1d1c17",
+                    "on-secondary-fixed": "#001e2c",
+                    "on-tertiary-container": "#433000",
+                    "outline": "#827564",
+                    "secondary-container": "#c7e7fc",
+                    "border-gold": "rgba(200, 146, 42, 0.3)",
+                    "on-secondary": "#ffffff",
+                    "on-surface-variant": "#504536",
+                    "on-primary-fixed": "#281900",
+                    "secondary-fixed-dim": "#abcbdf",
+                    "surface-tint": "#7e5700",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#c7e7fc",
+                    "inverse-primary": "#f8bc51",
+                    "on-tertiary-fixed-variant": "#5c4300",
+                    "outline-variant": "#d4c4b0",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#f0c052",
+                    "tertiary-container": "#c1952a",
+                    "success": "#3B6D11",
+                    "surface-container": "#f2ede5",
+                    "surface": "#FFFFFF",
+                    "error": "#ba1a1a",
+                    "background": "#fef9f1",
+                    "surface-container-highest": "#e7e2da",
+                    "primary-container": "#c8922a",
+                    "primary-fixed-dim": "#f8bc51",
+                    "inverse-on-surface": "#f5f0e8",
+                    "on-secondary-fixed-variant": "#2c4a5b",
+                    "on-surface": "#1d1c17",
+                    "on-primary-fixed-variant": "#5f4100",
+                    "inverse-surface": "#32302b",
+                    "tertiary": "#795900"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "xxl": "64px",
+                    "container-max": "1200px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "arabic-body": ["Noto Kufi Arabic"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "arabic-body": ["16px", {"lineHeight": "1.8", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pattern-divider {
+            background-image: radial-gradient(circle at 2px 2px, rgba(200, 146, 42, 0.15) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .zellij-mask {
+            mask-image: linear-gradient(to bottom, black, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm border-b border-gold">
+<nav class="flex justify-between items-center px-lg py-sm max-w-container-max mx-auto">
+<div class="flex items-center gap-sm">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Dosya دوسيا</span>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-body-md text-body-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 duration-200" href="#">Home</a>
+<a class="font-body-md text-body-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 duration-200" href="#">How it works</a>
+<a class="font-body-md text-body-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 duration-200" href="#">Features</a>
+<a class="font-body-md text-body-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 duration-200" href="#">Testimonials</a>
+<a class="font-body-md text-body-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 duration-200" href="#">FAQ</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-secondary font-body-md text-body-md hover:text-primary transition-colors">AR/FR</button>
+<button class="bg-primary hover:bg-primary-container text-white px-md py-xs rounded-lg transition-all active:scale-95 font-label-md text-label-md">Try for free</button>
+</div>
+</nav>
+</header>
+<main class="pt-xxl overflow-hidden">
+<!-- Hero Section: Gold Quote Mission Statement -->
+<section class="relative px-lg py-xxl flex flex-col items-center justify-center text-center overflow-hidden min-h-[614px]">
+<div class="absolute inset-0 pattern-divider opacity-20 -z-10"></div>
+<div class="max-w-4xl space-y-lg relative">
+<span class="material-symbols-outlined text-primary text-6xl opacity-40">format_quote</span>
+<h1 class="font-display-lg text-display-lg text-primary-container leading-tight">
+                    Reimagining the bridge between citizen and state through 
+                    <span class="text-primary italic">computational stewardship</span>.
+                </h1>
+<p class="font-body-lg text-body-lg text-text-muted max-w-2xl mx-auto">
+                    Dosya exists to transform Tunisian administrative complexity into a seamless digital dialogue, preserving heritage while embracing efficiency.
+                </p>
+<div class="flex justify-center pt-md">
+<div class="h-1 w-24 bg-primary rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- "Built for Tunisia" Bento Grid -->
+<section class="max-w-container-max mx-auto px-lg py-xxl">
+<div class="mb-xl text-center md:text-left">
+<h2 class="font-headline-lg text-headline-lg text-secondary">Built for Tunisia</h2>
+<p class="font-body-md text-body-md text-text-muted">Directly integrated with national data protocols and local context.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Large Feature -->
+<div class="md:col-span-2 bg-surface border border-gold rounded-xl p-lg flex flex-col md:flex-row gap-lg items-center group hover:shadow-xl transition-all duration-500">
+<div class="w-full md:w-1/2 rounded-lg overflow-hidden h-64 border border-gold/50 relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A professional, clean photograph of a modern government archive building in Tunis with golden sunlight hitting the sandstone walls and contemporary glass windows. The atmosphere is quiet, prestigious, and organized, reflecting the Tunisian administrative legacy combined with digital transparency. Minimalist composition with a warm light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaYHq1gaRWbSWkfjEa1i_a1Tj7o56a3nb4Aj-i93KFHnIsPWl74p26RbK_rb46ZInr67bhdr9H378CUAye3om4pcgXfun5DYGd4Xb9Y941_oRaHxVN6bu3piBjQ9WwNJNTCSbU5sxrtwjvsVvX6vBUQg20aEZeq9W4H7sA3KL6J5g-ngdvtBJ6E8fxvbifTXCtNxttMi2nhRTBn3sxMRRlAaeveDWwrjWHwsE9CtnAJjFwxVeihz2QUdvzm61IhNvxlE_c1kDXGvo"/>
+</div>
+<div class="w-full md:w-1/2 space-y-md">
+<div class="flex items-center gap-xs text-primary">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Integrity</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Universal Registry Sync</h3>
+<p class="font-body-md text-body-md text-text-muted">Securely synchronized with national registries to ensure your Dosya (دوسيا) profile is always legally accurate and instantly verifiable.</p>
+</div>
+</div>
+<!-- Secondary Item -->
+<div class="bg-surface border border-gold rounded-xl p-lg flex flex-col justify-between hover:shadow-xl transition-all">
+<div class="space-y-sm">
+<span class="material-symbols-outlined text-primary text-4xl">fingerprint</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Secure ID</h3>
+<p class="font-body-sm text-body-sm text-text-muted">Biometric-level security standards adapted for Tunisian digital infrastructure.</p>
+</div>
+<div class="mt-lg flex -space-x-2">
+<div class="h-8 w-8 rounded-full border-2 border-surface bg-secondary-container"></div>
+<div class="h-8 w-8 rounded-full border-2 border-surface bg-primary-container"></div>
+<div class="h-8 w-8 rounded-full border-2 border-surface bg-surface-variant"></div>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="bg-primary text-white rounded-xl p-lg flex flex-col items-center text-center justify-center gap-md group overflow-hidden relative">
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent)]"></div>
+<span class="material-symbols-outlined text-5xl transform group-hover:rotate-12 transition-transform">translate</span>
+<h3 class="font-headline-md text-headline-md">Bilingual Heritage</h3>
+<p class="font-arabic-body text-arabic-body opacity-90 leading-loose">واجهة مستخدم ثنائية اللغة تدعم العربية والفرنسية بسلاسة تامة.</p>
+</div>
+<!-- Feature 4 -->
+<div class="md:col-span-2 bg-surface-container-low border border-gold rounded-xl p-lg flex flex-col md:flex-row gap-lg items-center">
+<div class="space-y-sm w-full md:w-2/3">
+<h3 class="font-headline-md text-headline-md text-on-surface">Open GovTech API</h3>
+<p class="font-body-md text-body-md text-text-muted">Empowering local developers to build on top of our verified documentation layer, fostering a new era of Tunisian software excellence.</p>
+<button class="flex items-center gap-xs font-label-md text-label-md text-primary mt-sm hover:gap-md transition-all">
+                            Explore Developer Docs <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="w-full md:w-1/3 flex justify-end">
+<div class="grid grid-cols-2 gap-xs">
+<div class="w-12 h-12 bg-white border border-gold rounded rotate-3 flex items-center justify-center"><span class="material-symbols-outlined text-primary">terminal</span></div>
+<div class="w-12 h-12 bg-white border border-gold rounded -rotate-6 flex items-center justify-center"><span class="material-symbols-outlined text-primary">code</span></div>
+<div class="w-12 h-12 bg-white border border-gold rounded rotate-12 flex items-center justify-center"><span class="material-symbols-outlined text-primary">token</span></div>
+<div class="w-12 h-12 bg-white border border-gold rounded -rotate-2 flex items-center justify-center"><span class="material-symbols-outlined text-primary">api</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Team Section -->
+<section class="bg-surface-container-lowest py-xxl relative">
+<div class="max-w-container-max mx-auto px-lg">
+<div class="flex flex-col md:flex-row justify-between items-end mb-xl gap-md">
+<div class="max-w-xl">
+<h2 class="font-headline-lg text-headline-lg text-secondary">The Reliable Stewards</h2>
+<p class="font-body-md text-body-md text-text-muted mt-sm">Led by a team of Tunisian technologists, legal experts, and designers committed to administrative dignity.</p>
+</div>
+<a class="text-primary font-label-md text-label-md flex items-center gap-xs group" href="#">
+                        Careers at Dosya <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">east</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Team Card 1 -->
+<div class="group">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-md border border-gold bg-surface-variant">
+<img class="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-500" data-alt="A professional portrait of a confident male technology leader with a warm and professional expression, wearing a stylish navy blue linen blazer. He is standing in a brightly lit, modern architectural space with elements of traditional Tunisian patterns visible in the background. The aesthetic is high-end, clean, and trustworthy, with a warm ivory and gold color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCztG452iOu2qSagWhNY9PjpFPXqTs1fZzNRxC-sCFEWk4GbQNDJZFSz3R14uHBM5TtTicdrBg-eid5POxdo9RyeJPYHCuwM3DSme3EtCHRcmhx849lqCgYbsJf1WMlsZChS3ybm-6bx354sr5XfE2GlFGHwK4O5wxwZJs1cDjgMJ3FupdgxrVE1OwRJlNharVimMsSHbm2-I0TpgvAAslTuiFVLo_NbOdk-DwjKCY2w3jbwQ9IWax1R-HgGcnicO-Gra4ck_l6f44"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-lg">
+<p class="text-white font-body-sm text-body-sm">Former GovTech Lead with 15 years in digital infrastructure.</p>
+</div>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Sami Ben Amor</h4>
+<p class="font-label-md text-label-md text-primary tracking-wide">CEO &amp; CO-FOUNDER</p>
+</div>
+<!-- Team Card 2 -->
+<div class="group">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-md border border-gold bg-surface-variant">
+<img class="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-500" data-alt="A professional portrait of an elegant female design lead with an authoritative and friendly smile, wearing a sophisticated cream-colored blouse. She is set against a clean, minimalist background featuring subtle geometric Zellij patterns. The lighting is soft and flattering, emphasizing a modern heritage tech aesthetic with professional high-key lighting and a palette of warm ivory and Carthage gold." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEqj4x1Uy8dRohEsnlqaYXERiibI14CSOXDn0Z8qrwLwST1nEtClKZmOiW_asXpM_82_rj54nAyJjtWR8TKPlkmARzJbZiv6MudpfGBYNfgfoBDTHAmphzVSzMKDuBxf4GEu2JeSP63aJ-mrQ27uYG1oyY9HqJxxLnTFL3zWSuBK_VuZs-URSmcZn_JLSL26rvV7U4EFkKiH0geseGv5i1TF709avaYjRJTY8Iaj5at_-M4n_t4nRTPb5GyhfQwmFBX-HNRKYyGXQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-lg">
+<p class="text-white font-body-sm text-body-sm">Specialist in user-centric legal systems and human-machine interfaces.</p>
+</div>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Leila Trabelsi</h4>
+<p class="font-label-md text-label-md text-primary tracking-wide">HEAD OF EXPERIENCE</p>
+</div>
+<!-- Team Card 3 -->
+<div class="group">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-md border border-gold bg-surface-variant">
+<img class="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-500" data-alt="A professional portrait of a focused male CTO in his early 30s, wearing a modern dark grey polo. He is standing in a high-tech office environment that mixes sleek glass with warm wood textures. The shot is composed with professional depth of field, using the brand's sophisticated primary colors and a minimalist, trustworthy mood that conveys technical excellence and Mediterranean warmth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeiG2wsbREawdZU6q15T3-uJV9_WFaFwijH78HY6EBKEChqsBgCUtlAf15aW9wTTlVJek6PyNDw-t9raaNpft7pxdnxj76OSgcUUtN182Nz46HMnisv5hX1zEuTDrz7meQxWIqZitFDAXyPI2rD8fPTJWTMHG-ssFwW9nLX_EqkYLWW54GPJMN1p-BPIjOHg_hvdAsBF4jk1PdiibKsaEZYtK_FVXegUXtBLyPLejTHgjd07zOuw1O1FsuKnblxd_ghfKFNygd6L8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-lg">
+<p class="text-white font-body-sm text-body-sm">Cybersecurity architect focused on national-scale data encryption.</p>
+</div>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Anis Mansour</h4>
+<p class="font-label-md text-label-md text-primary tracking-wide">CHIEF ARCHITECT</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Press Mentions -->
+<section class="py-xl border-y border-gold/20">
+<div class="max-w-container-max mx-auto px-lg">
+<p class="text-center font-label-md text-label-md text-text-muted mb-lg tracking-widest uppercase">Recognized By</p>
+<div class="flex flex-wrap justify-center items-center gap-xl opacity-60 grayscale hover:grayscale-0 transition-all">
+<span class="font-bold text-headline-md text-secondary tracking-tighter">TunisieNumérique</span>
+<span class="font-bold text-headline-md text-secondary tracking-tighter">TECH AFRICA</span>
+<span class="font-bold text-headline-md text-secondary tracking-tighter">LEADERSHIP</span>
+<span class="font-bold text-headline-md text-secondary tracking-tighter">GovInsights</span>
+<span class="font-bold text-headline-md text-secondary tracking-tighter">TAP NEWS</span>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="max-w-container-max mx-auto px-lg py-xxl">
+<div class="bg-surface border border-gold p-xl rounded-xl text-center space-y-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed/20 blur-3xl rounded-full"></div>
+<div class="absolute bottom-0 left-0 w-40 h-40 bg-secondary-container/10 blur-3xl rounded-full"></div>
+<h2 class="font-display-lg text-headline-lg md:text-display-lg text-on-surface relative z-10">Start your administrative <span class="text-primary italic">evolution</span>.</h2>
+<p class="font-body-md text-body-md text-text-muted max-w-xl mx-auto relative z-10">
+                    Join thousands of Tunisians managing their official lives with clarity and dignity. Secure, official, and effortlessly modern.
+                </p>
+<div class="flex flex-col sm:flex-row justify-center gap-md relative z-10 pt-md">
+<button class="bg-primary hover:bg-primary-container text-white px-xl py-md rounded-lg font-label-md text-label-md transition-all shadow-md active:scale-95">Sign up</button>
+<button class="border border-gold text-primary hover:bg-surface-container-low px-xl py-md rounded-lg font-label-md text-label-md transition-all active:scale-95">Contact Sales</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container dark:bg-surface-container-highest w-full mt-xxl border-t border-gold">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg px-lg py-xl max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1 space-y-md">
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">Dosya دوسيا</span>
+<p class="font-body-sm text-body-sm text-text-muted">Digitalizing the backbone of Tunisia. Built for citizens, powered by transparency.</p>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-md">Product</h4>
+<ul class="space-y-sm">
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">How it works</a></li>
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Features</a></li>
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Testimonials</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-md">Resources</h4>
+<ul class="space-y-sm">
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">FAQ</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-md">Company</h4>
+<ul class="space-y-sm">
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">About GovTech</a></li>
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Us</a></li>
+<li><a class="font-body-sm text-body-sm text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Press Kit</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-gold/10 px-lg py-md max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-sm">
+<p class="font-body-sm text-body-sm text-text-muted">© 2024 Dosya دوسيا. All rights reserved.</p>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer">share</span>
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer">public</span>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for team cards grayscale toggle
+        document.querySelectorAll('.group img').forEach(img => {
+            img.addEventListener('mouseenter', () => {
+                img.style.filter = 'grayscale(0%)';
+            });
+            img.addEventListener('mouseleave', () => {
+                img.style.filter = 'grayscale(100%)';
+            });
+        });
+    </script>
+</body></html>
