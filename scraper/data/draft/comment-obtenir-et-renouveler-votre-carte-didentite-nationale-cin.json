@@ -1,0 +1,88 @@
+{
+  "slug": "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin",
+  "titleFr": "Comment obtenir et renouveler votre carte d’identité nationale (CIN)",
+  "titleAr": "Comment obtenir et renouveler votre carte d’identité nationale (CIN)",
+  "titleTn": null,
+  "descriptionFr": "La carte d’identité tunisienne est un document officiel indispensable pour tout citoyen. Elle prouve l’identité et la nationalité de son titulaire et offre l’ accès aux services administratifs et juridiques . À partir de 2024, elle devient biométrique Vous voulez savoir si vous êtes concerné ? La réponse dans cet article.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "15 jours",
+  "fees": "3 DT",
+  "sourceUrl": "https://www.demarches.tn/carte-identite-tunisienne/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "Une attestation prouvant la nationalité tunisienne comme le certificat de nationalité ;",
+      "titleAr": "Une attestation prouvant la nationalité tunisienne comme le certificat de nationalité ;"
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "Une attestation de résidence ainsi qu’une attestation de travail ou de présence scolaire ;",
+      "titleAr": "Une attestation de résidence ainsi qu’une attestation de travail ou de présence scolaire ;"
+    },
+    {
+      "sortOrder": 3,
+      "titleFr": "L’autorisation du tuteur légal signée et légalisée pour les mineurs de moins de 18 ans.",
+      "titleAr": "L’autorisation du tuteur légal signée et légalisée pour les mineurs de moins de 18 ans."
+    },
+    {
+      "sortOrder": 4,
+      "titleFr": "Un extrait de n a issance de moins de trois mois",
+      "titleAr": "Un extrait de n a issance de moins de trois mois"
+    },
+    {
+      "sortOrder": 5,
+      "titleFr": "3 photos d’identité 3 cm sur 4. Le fond doit être blanc et montrer vos cheveux et vos yeux ;",
+      "titleAr": "3 photos d’identité 3 cm sur 4. Le fond doit être blanc et montrer vos cheveux et vos yeux ;"
+    },
+    {
+      "sortOrder": 6,
+      "titleFr": "La copie de la carte à renouveler. L’originale doit être en votre possession.",
+      "titleAr": "La copie de la carte à renouveler. L’originale doit être en votre possession."
+    },
+    {
+      "sortOrder": 7,
+      "titleFr": "Et un récépissé attestant de votre paiement de 3 dinars réglé dans un bureau de recettes des finances.",
+      "titleAr": "Et un récépissé attestant de votre paiement de 3 dinars réglé dans un bureau de recettes des finances."
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "Seules les personnes majeures peuvent la demander. La demande pour un mineur doit être soumise par le représentant légal.",
+      "titleAr": "Seules les personnes majeures peuvent la demander. La demande pour un mineur doit être soumise par le représentant légal."
+    },
+    {
+      "stepNumber": 2,
+      "titleFr": "Pour le renouvellement de votre CNI dans le cas d’une perte ou d’un vol , vous devez fournir une attestation sur l’honneur de déclaration de perte de carte d’identité .",
+      "titleAr": "Pour le renouvellement de votre CNI dans le cas d’une perte ou d’un vol , vous devez fournir une attestation sur l’honneur de déclaration de perte de carte d’identité ."
+    },
+    {
+      "stepNumber": 3,
+      "titleFr": "Vous devez déposer ce dossier au poste de police le plus proche de chez vous, où un agent compétent prendra vos données biométriques. Vous devrez également remplir un document administratif. Afin d’être certain d’être reçu, nous vous conseillons de prendre rendez-vous au préalable.",
+      "titleAr": "Vous devez déposer ce dossier au poste de police le plus proche de chez vous, où un agent compétent prendra vos données biométriques. Vous devrez également remplir un document administratif. Afin d’être certain d’être reçu, nous vous conseillons de prendre rendez-vous au préalable."
+    },
+    {
+      "stepNumber": 4,
+      "titleFr": "Le ministère de l’intérieur est chargé de superviser la délivrance de la carte biométrique. Pour les résidents tunisiens à l’étranger, le dépôt du dossier se fait au consulat ou à l’ambassade du pays dans lequel ils se trouvent. Vous dépendez alors du Mini stère des affaires étrangères, de la migration et des tunisiens à l’étranger .",
+      "titleAr": "Le ministère de l’intérieur est chargé de superviser la délivrance de la carte biométrique. Pour les résidents tunisiens à l’étranger, le dépôt du dossier se fait au consulat ou à l’ambassade du pays dans lequel ils se trouvent. Vous dépendez alors du Mini stère des affaires étrangères, de la migration et des tunisiens à l’étranger ."
+    },
+    {
+      "stepNumber": 5,
+      "titleFr": "Sous réserve de votre dossier complet, votre carte est délivrée sous 15 jours . Vous êtes notifié par le moyen de communication que vous avez choisi lors de votre dépôt (téléphone ou e-mail).",
+      "titleAr": "Sous réserve de votre dossier complet, votre carte est délivrée sous 15 jours . Vous êtes notifié par le moyen de communication que vous avez choisi lors de votre dépôt (téléphone ou e-mail)."
+    },
+    {
+      "stepNumber": 6,
+      "titleFr": "Dans le cadre d’un renouvellement, vous devez remettre votre carte périmée.",
+      "titleAr": "Dans le cadre d’un renouvellement, vous devez remettre votre carte périmée."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

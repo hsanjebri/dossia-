@@ -1,0 +1,47 @@
+{
+  "slug": "attestation-de-concordance-didentite-pour-des-papiers-sans-erreurs",
+  "titleFr": "Attestation de concordance d’identité : pour des papiers sans erreurs",
+  "titleAr": "Attestation de concordance d’identité : pour des papiers sans erreurs",
+  "titleTn": null,
+  "descriptionFr": "L’attestation de concordance d’identité est souvent la clé pour débloquer une démarche administrative lorsque vos documents officiels ne portent pas exactement le même nom. Que ce soit en Tunisie ou à l’étranger, elle vous permet d’harmoniser vos papiers et d’éviter les refus liés à une simple différence d’orthographe.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "7 minutes",
+  "fees": "À vérifier",
+  "sourceUrl": "https://www.demarches.tn/attestation-concordance/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "Préparer les justificatifs :Munissez-vous d’une copie intégrale de votre acte de naissance tunisien (ou français, selon le cas). Préparez également votre carte d’identité ou votre passeport tunisien en cours de validité. Ajoutez tout document étranger où figure la version différente de votre nom (passeport français, titre de séjour , acte d’état civil étranger…). Un certificat de nationalité tunisienne peut également être utile.",
+      "titleAr": "Préparer les justificatifs :Munissez-vous d’une copie intégrale de votre acte de naissance tunisien (ou français, selon le cas). Préparez également votre carte d’identité ou votre passeport tunisien en cours de validité. Ajoutez tout document étranger où figure la version différente de votre nom (passeport français, titre de séjour , acte d’état civil étranger…). Un certificat de nationalité tunisienne peut également être utile."
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "Prendre rendez-vous en ligne sur le portail econsulat.tn en sélectionnant le service « Attestation de concordance ».",
+      "titleAr": "Prendre rendez-vous en ligne sur le portail econsulat.tn en sélectionnant le service « Attestation de concordance »."
+    },
+    {
+      "sortOrder": 3,
+      "titleFr": "Se présenter en personne au consulat, le jour convenu, avec tous les justificatifs en main.",
+      "titleAr": "Se présenter en personne au consulat, le jour convenu, avec tous les justificatifs en main."
+    },
+    {
+      "sortOrder": 4,
+      "titleFr": "Remplir le formulaire ou rédiger la demande : certains consulats fournissent un modèle à compléter, sinon une simple lettre suffit. Précisez que vous sollicitez une attestation de concordance. Expliquez brièvement la différence à corriger. Vous signerez l’acte sur place ou validerez la demande.",
+      "titleAr": "Remplir le formulaire ou rédiger la demande : certains consulats fournissent un modèle à compléter, sinon une simple lettre suffit. Précisez que vous sollicitez une attestation de concordance. Expliquez brièvement la différence à corriger. Vous signerez l’acte sur place ou validerez la demande."
+    },
+    {
+      "sortOrder": 5,
+      "titleFr": "Régler les frais consulaires : une taxe de 7 € (droits de chancellerie) est généralement appliquée.",
+      "titleAr": "Régler les frais consulaires : une taxe de 7 € (droits de chancellerie) est généralement appliquée."
+    }
+  ],
+  "steps": [],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

@@ -1,0 +1,73 @@
+{
+  "slug": "comment-obtenir-un-passeport-tunisien-facilement",
+  "titleFr": "Comment obtenir un passeport tunisien facilement ?",
+  "titleAr": "Comment obtenir un passeport tunisien facilement ?",
+  "titleTn": null,
+  "descriptionFr": "Le passeport tunisien est le document indispensable si vous souhaitez voyager en dehors de la Tunisie. Pour obtenir ou renouveler votre passeport tunisien, vous devez fournir un dossier très précis. Dans cet article, nous vous expliquons la procédure en détail.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "15 jours",
+  "fees": "Le prix de cette démarche s’élève à 25 D pour les étudiants et élèves, ainsi que les enfants de moins de 7 ans . Pour les autres, le montant est de 80 D . Dans le cadre d’un renouvellement de passeport altéré, le montant s’élève à 150 D le délai de traitement est de 15 jours à partir de la date de dépôt du dossier complet. Sa durée de validité est de 5 ans .",
+  "sourceUrl": "https://www.demarches.tn/passeport/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "4 photos d’identité , sur fond blanc et au format 3,5/4,5 cm ;",
+      "titleAr": "4 photos d’identité , sur fond blanc et au format 3,5/4,5 cm ;"
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "la photocopie de votre carte d’identité avec la présentation de l’originale ainsi qu’un extrait de naissance pour les mineurs ;",
+      "titleAr": "la photocopie de votre carte d’identité avec la présentation de l’originale ainsi qu’un extrait de naissance pour les mineurs ;"
+    },
+    {
+      "sortOrder": 3,
+      "titleFr": "l’imprimé d’obtention d’un passeport ordinaire, lisible à la machine, rempli et dûment signé dans la case afférente ;",
+      "titleAr": "l’imprimé d’obtention d’un passeport ordinaire, lisible à la machine, rempli et dûment signé dans la case afférente ;"
+    },
+    {
+      "sortOrder": 4,
+      "titleFr": "la quittance de paiement délivrée par les recettes de finance ;",
+      "titleAr": "la quittance de paiement délivrée par les recettes de finance ;"
+    },
+    {
+      "sortOrder": 5,
+      "titleFr": "un justificatif de scolarisation pour les élèves et étudiants (qui peuvent bénéficier d’un tarif préférentiel) ;",
+      "titleAr": "un justificatif de scolarisation pour les élèves et étudiants (qui peuvent bénéficier d’un tarif préférentiel) ;"
+    },
+    {
+      "sortOrder": 6,
+      "titleFr": "l’autorisation du tuteur ainsi que la photocopie de sa carte d’identité nationale pour les mineurs.",
+      "titleAr": "l’autorisation du tuteur ainsi que la photocopie de sa carte d’identité nationale pour les mineurs."
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "Pour obtenir votre passeport, vous devez avoir en votre possession tous les documents cités. Ensuite, vous devez les transmettre au poste de police ou de la garde nationale d e votre résidence. Le dossier est ensuite remis au secteur de la sûreté pour une consultation avec la direction des frontières et des étrangers. La remise du passeport s’effectue au poste de la police ou de la garde nationale directement à son titulaire. Cette procédure est supervisée par le ministère de l’intérieur .",
+      "titleAr": "Pour obtenir votre passeport, vous devez avoir en votre possession tous les documents cités. Ensuite, vous devez les transmettre au poste de police ou de la garde nationale d e votre résidence. Le dossier est ensuite remis au secteur de la sûreté pour une consultation avec la direction des frontières et des étrangers. La remise du passeport s’effectue au poste de la police ou de la garde nationale directement à son titulaire. Cette procédure est supervisée par le ministère de l’intérieur ."
+    },
+    {
+      "stepNumber": 2,
+      "titleFr": "Le passeport ne peut être envoyé que par voie postale.",
+      "titleAr": "Le passeport ne peut être envoyé que par voie postale."
+    },
+    {
+      "stepNumber": 3,
+      "titleFr": "Si vous êtes à l’étranger et que vous souhaitez renouveler votre passeport, découvrez dans cet article la procédure à effectuer.",
+      "titleAr": "Si vous êtes à l’étranger et que vous souhaitez renouveler votre passeport, découvrez dans cet article la procédure à effectuer."
+    },
+    {
+      "stepNumber": 4,
+      "titleFr": "En cas de perte ou de vol, la procédure reste similaire. Il vous faudra effectuer une demande de duplicata. Vous devez fournir une attestation de déclaration de perte du passeport ainsi que tout document prouvant la nécessité de l’obtention de ce duplicata. La quittance de paiement du droit de timbre fiscal s’élève à 150 dinars .",
+      "titleAr": "En cas de perte ou de vol, la procédure reste similaire. Il vous faudra effectuer une demande de duplicata. Vous devez fournir une attestation de déclaration de perte du passeport ainsi que tout document prouvant la nécessité de l’obtention de ce duplicata. La quittance de paiement du droit de timbre fiscal s’élève à 150 dinars ."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

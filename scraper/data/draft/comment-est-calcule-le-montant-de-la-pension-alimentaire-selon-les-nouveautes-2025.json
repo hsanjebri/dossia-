@@ -1,0 +1,42 @@
+{
+  "slug": "comment-est-calcule-le-montant-de-la-pension-alimentaire-selon-les-nouveautes-2025",
+  "titleFr": "Comment est calculé le montant de la pension alimentaire selon les nouveautés 2025 ?",
+  "titleAr": "Comment est calculé le montant de la pension alimentaire selon les nouveautés 2025 ?",
+  "titleTn": null,
+  "descriptionFr": "Chaque année, la Tunisie enregistre entre 12 000 et 13 000 divorces. Derrière ces ruptures se cachent des milliers d’enfants et de conjoints confrontés à une question essentielle : la pension alimentaire. Plus qu’une simple obligation financière, elle représente un filet de sécurité juridique et social destiné à garantir la dignité et l’équilibre des familles après la séparation.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "2 à 6 mois",
+  "fees": "À vérifier",
+  "sourceUrl": "https://www.demarches.tn/pension-alimentaire-calcul-montant/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "La demande doit être déposée au greffe du tribunal de première instance du domicile du défendeur. En cas de non-paiement, le dossier pour activation du Fonds de Garantie doit être déposé au bureau régional de la CNSS correspondant à la circonscription judiciaire.",
+      "titleAr": "La demande doit être déposée au greffe du tribunal de première instance du domicile du défendeur. En cas de non-paiement, le dossier pour activation du Fonds de Garantie doit être déposé au bureau régional de la CNSS correspondant à la circonscription judiciaire."
+    },
+    {
+      "stepNumber": 2,
+      "titleFr": "En général, une décision peut être rendue dans les 2 à 6 mois suivant la demande. Le Fonds de Garantie verse les montants dus dans un délai de 15 jours après dépôt du dossier complet , pour une période maximale de 8 mois par année civile .",
+      "titleAr": "En général, une décision peut être rendue dans les 2 à 6 mois suivant la demande. Le Fonds de Garantie verse les montants dus dans un délai de 15 jours après dépôt du dossier complet , pour une période maximale de 8 mois par année civile ."
+    },
+    {
+      "stepNumber": 3,
+      "titleFr": "La revalorisation de la pension alimentaire 2023 et 2024 suit le coût de la vie. Une demande de changement de pension alimentaire peut être déposée au tribunal en cas de perte d’emploi ou baisse significative des revenus du débiteur ou d’augmentation des besoins de l’enfant ( maladie , études supérieures).",
+      "titleAr": "La revalorisation de la pension alimentaire 2023 et 2024 suit le coût de la vie. Une demande de changement de pension alimentaire peut être déposée au tribunal en cas de perte d’emploi ou baisse significative des revenus du débiteur ou d’augmentation des besoins de l’enfant ( maladie , études supérieures)."
+    },
+    {
+      "stepNumber": 4,
+      "titleFr": "La pension alimentaire est exécutoire à l’étranger si la Tunisie a une convention bilatérale avec le pays de résidence du débiteur. Sinon, il faut engager une procédure de reconnaissance du jugement et de recouvrement dans le pays concerné.",
+      "titleAr": "La pension alimentaire est exécutoire à l’étranger si la Tunisie a une convention bilatérale avec le pays de résidence du débiteur. Sinon, il faut engager une procédure de reconnaissance du jugement et de recouvrement dans le pays concerné."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

@@ -1,0 +1,27 @@
+{
+  "slug": "le-parcours-pour-obtenir-un-livret-de-famille",
+  "titleFr": "Le parcours pour obtenir un livret de famille",
+  "titleAr": "Le parcours pour obtenir un livret de famille",
+  "titleTn": null,
+  "descriptionFr": "En tant que chef de famille , vous devez justifier des liens de parenté dans votre foyer, et ce pour de nombreuses démarches administratives. Il existe un document pour cela, le livret de famille. Voici les étapes pour l’obtenir.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "5 minutes",
+  "fees": "À vérifier",
+  "sourceUrl": "https://www.demarches.tn/livret-de-famille/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "Une redevance d’environ 13 € est à prévoir pour couvrir les frais administratifs",
+      "titleAr": "Une redevance d’environ 13 € est à prévoir pour couvrir les frais administratifs"
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

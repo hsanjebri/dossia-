@@ -1,0 +1,3 @@
+ALTER TABLE procedures
+    ALTER COLUMN processing_time TYPE VARCHAR(500),
+    ALTER COLUMN fees TYPE VARCHAR(500);

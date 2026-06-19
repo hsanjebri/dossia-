@@ -22,16 +22,34 @@ from pathlib import Path
 
 import requests
 
+from normalize import truncate_field
+
 ROOT = Path(__file__).resolve().parent
 DRAFT_DIR = ROOT / "data" / "draft"
 DEFAULT_API_URL = os.environ.get("DOSSIA_API_URL", "http://localhost:8080")
+
+
+def sanitize_procedure(procedure: dict) -> dict:
+    """Ensure API field limits before import."""
+    procedure = dict(procedure)
+    procedure["fees"] = truncate_field(procedure.get("fees"), 500) or "À vérifier"
+    procedure["processingTime"] = truncate_field(procedure.get("processingTime"), 500) or "À vérifier"
+    steps = []
+    for step in procedure.get("steps") or []:
+        step = dict(step)
+        title = truncate_field(step.get("titleFr"), 500) or "Étape"
+        step["titleFr"] = title
+        step["titleAr"] = truncate_field(step.get("titleAr"), 500) or title
+        steps.append(step)
+    procedure["steps"] = steps
+    return procedure
 
 
 def load_json_files(directory: Path) -> list[dict]:
     procedures = []
     for path in sorted(directory.glob("*.json")):
         with path.open(encoding="utf-8") as handle:
-            procedures.append(json.load(handle))
+            procedures.append(sanitize_procedure(json.load(handle)))
     return procedures
 
 
@@ -89,7 +107,7 @@ def main() -> None:
         return
 
     if args.file:
-        procedures = [json.loads(args.file.read_text(encoding="utf-8"))]
+        procedures = [sanitize_procedure(json.loads(args.file.read_text(encoding="utf-8")))]
     else:
         procedures = load_json_files(DRAFT_DIR)
 

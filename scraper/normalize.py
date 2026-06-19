@@ -47,8 +47,8 @@ def draft_procedure(
         "category": category,
         "difficulty": difficulty,
         "deliveryMode": delivery_mode,
-        "processingTime": processing_time,
-        "fees": fees,
+        "processingTime": truncate_field(processing_time, 500),
+        "fees": truncate_field(fees, 500),
         "sourceUrl": source_url,
         "sourceReference": source_reference,
         "status": "DRAFT",
@@ -57,6 +57,31 @@ def draft_procedure(
         "offices": offices or [],
         "relatedProcedureSlugs": related_procedure_slugs or [],
     }
+
+
+def truncate_field(value: str | None, max_length: int = 500) -> str | None:
+    if value is None:
+        return None
+    if len(value) <= max_length:
+        return value
+    return value[: max_length - 1] + "…"
+
+
+def pick_short_value(
+    extracted: str | None,
+    hint: str | None,
+    section: str | None,
+    *,
+    max_length: int = 100,
+    fallback: str = "À vérifier",
+) -> str:
+    if extracted:
+        return extracted
+    if hint:
+        return hint
+    if section and len(section) <= max_length:
+        return section
+    return fallback
 
 
 def extract_text_lines(html: str) -> list[str]:

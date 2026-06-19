@@ -1,0 +1,38 @@
+{
+  "slug": "tout-savoir-sur-lobtention-de-lextrait-de-mariage-en-tunisie",
+  "titleFr": "Tout savoir sur l’obtention de l’extrait de mariage en Tunisie",
+  "titleAr": "Tout savoir sur l’obtention de l’extrait de mariage en Tunisie",
+  "titleTn": null,
+  "descriptionFr": "Vous êtes marié et vous avez besoin de votre extrait de mariage dans le cadre de démarches administratives ? Vous pouvez en faire la demande à l’officier d’état civil ou de l’administration de proximité. Nous vous expliquons les démarches.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "immédiatement",
+  "fees": "La demande d’extrait de mariage tunisien s’élève à 1,000 D. Il est vous est délivré presqu’immédiatement et au maximum 24h après votre demande en ligne. Il reste valable durant trois mois après son obtention.",
+  "sourceUrl": "https://www.demarches.tn/extrait-de-mariage/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "des renseignements relatifs au mariage (le numéro, l’année et le jour) en précisant si le mariage a été conclu en mairie ou devant des notaires ;",
+      "titleAr": "des renseignements relatifs au mariage (le numéro, l’année et le jour) en précisant si le mariage a été conclu en mairie ou devant des notaires ;"
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "du paiement des redevances dues (paiement en espèce ou par mandat postal) au nom du régisseur des recettes auprès de la municipalité avec une enveloppe timbrée portant l’adresse votre adresse si vous souhaitez le recevoir par voie postale.",
+      "titleAr": "du paiement des redevances dues (paiement en espèce ou par mandat postal) au nom du régisseur des recettes auprès de la municipalité avec une enveloppe timbrée portant l’adresse votre adresse si vous souhaitez le recevoir par voie postale."
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "Pour les demandes effectuées à l’étranger, les mariés peuvent s’adresser au service d’état civil du consulat ou de l’ambassade tunisienne du pays dans lequel il se trouve.",
+      "titleAr": "Pour les demandes effectuées à l’étranger, les mariés peuvent s’adresser au service d’état civil du consulat ou de l’ambassade tunisienne du pays dans lequel il se trouve."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

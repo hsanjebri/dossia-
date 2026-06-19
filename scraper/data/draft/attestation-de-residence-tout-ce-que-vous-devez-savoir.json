@@ -1,0 +1,21 @@
+{
+  "slug": "attestation-de-residence-tout-ce-que-vous-devez-savoir",
+  "titleFr": "Attestation de résidence : Tout ce que vous devez savoir",
+  "titleAr": "Attestation de résidence : Tout ce que vous devez savoir",
+  "titleTn": null,
+  "descriptionFr": "Que vous soyez un citoyen tunisien, un résident étranger ou un étudiant étranger, cette attestation est un document essentiel pour de nombreuses procédures administratives. Découvrez ce qu’est un certificat de résidence, son importance, les conditions requises et comment effectuer la demande.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "4 minutes",
+  "fees": "5 dinars",
+  "sourceUrl": "https://www.demarches.tn/certificat-de-residence/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [],
+  "steps": [],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

@@ -1,0 +1,42 @@
+{
+  "slug": "comment-obtenir-une-attestation-de-non-imposition-pour-les-tunisiens-residant-a-letranger",
+  "titleFr": "Comment obtenir une attestation de non-imposition pour les Tunisiens résidant à l’étranger?",
+  "titleAr": "Comment obtenir une attestation de non-imposition pour les Tunisiens résidant à l’étranger?",
+  "titleTn": null,
+  "descriptionFr": "Aucune déclaration de revenus en Tunisie ? L’attestation de non-imposition est le document qui prouve officiellement que vous ne devez aucun impôt. Simple mais indispensable, elle facilite vos démarches administratives, que ce soit pour un visa, un prêt ou un dossier fiscal.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "48 heures",
+  "fees": "L’attestation de non-imposition est généralement délivrée très rapidement, souvent le jour même du dépôt de la demande , surtout si le dossier est complet. Dans certains centres fiscaux, le délai peut aller jusqu’à 24 à 48 heures, selon l’affluence ou la vérification préalable du statut du demandeur. En ce qui concerne sa validité, l’attestation n’a pas de durée de validité officielle : elle est considérée comme un document ponctuel, valable pour l’année fiscale mentionnée ou en cours. Si vous avez besoin d’un justificatif pour une autre année (par exemple pour un dossier bancaire ou une demande administrative postérieure), il est préférable d’en demander une nouvelle afin que la situation soit actualisée.",
+  "sourceUrl": "https://www.demarches.tn/attestation-non-imposition-pour-tunisiens-residant-etranger/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "La demande doit être adressée au bureau de contrôle des impôts compétent, c’est-à-dire celui du lieu de résidence figurant sur la CIN . Pour un Tunisien résidant à l’étranger, c’est généralement le bureau rattaché à son ancienne adresse en Tunisie qui traite la demande.",
+      "titleAr": "La demande doit être adressée au bureau de contrôle des impôts compétent, c’est-à-dire celui du lieu de résidence figurant sur la CIN . Pour un Tunisien résidant à l’étranger, c’est généralement le bureau rattaché à son ancienne adresse en Tunisie qui traite la demande."
+    },
+    {
+      "stepNumber": 2,
+      "titleFr": "Vous pouvez déposer votre demande en personne, au guichet du centre des impôts , ou par courrier postal (simple ou recommandé) adressé au directeur du bureau de contrôle.",
+      "titleAr": "Vous pouvez déposer votre demande en personne, au guichet du centre des impôts , ou par courrier postal (simple ou recommandé) adressé au directeur du bureau de contrôle."
+    },
+    {
+      "stepNumber": 3,
+      "titleFr": "Les procédures fiscales tunisiennes acceptent les deux modes : dépôt physique ou envoi par la poste. Les Tunisiens de l’étranger peuvent ainsi mandater un proche ou envoyer leur demande par procuration .",
+      "titleAr": "Les procédures fiscales tunisiennes acceptent les deux modes : dépôt physique ou envoi par la poste. Les Tunisiens de l’étranger peuvent ainsi mandater un proche ou envoyer leur demande par procuration ."
+    },
+    {
+      "stepNumber": 4,
+      "titleFr": "Exemple réel : Ahlem, Tunisienne vivant au Qatar Ahlem travaille depuis plusieurs années au Qatar. Lorsqu’elle a voulu créer une petite entreprise en Tunisie, l’administration lui a demandé une attestation de non-imposition pour prouver qu’elle n’avait aucun revenu local. Ahlem a présenté sa carte d’identité tunisienne, une attestation de résidence fiscale du Qatar et des relevés bancaires justifiant que ses revenus étaient étrangers. Grâce à la convention de non-double imposition entre la Tunisie et le Qatar, elle a obtenu facilement le document et pu lancer son activité en toute conformité.",
+      "titleAr": "Exemple réel : Ahlem, Tunisienne vivant au Qatar Ahlem travaille depuis plusieurs années au Qatar. Lorsqu’elle a voulu créer une petite entreprise en Tunisie, l’administration lui a demandé une attestation de non-imposition pour prouver qu’elle n’avait aucun revenu local. Ahlem a présenté sa carte d’identité tunisienne, une attestation de résidence fiscale du Qatar et des relevés bancaires justifiant que ses revenus étaient étrangers. Grâce à la convention de non-double imposition entre la Tunisie et le Qatar, elle a obtenu facilement le document et pu lancer son activité en toute conformité."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

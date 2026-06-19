@@ -1,0 +1,53 @@
+{
+  "slug": "comment-renouveler-son-passeport-tunisien-lorsquon-est-a-letranger",
+  "titleFr": "Comment renouveler son passeport tunisien lorsqu’on est à l’étranger ?",
+  "titleAr": "Comment renouveler son passeport tunisien lorsqu’on est à l’étranger ?",
+  "titleTn": null,
+  "descriptionFr": "Le renouvellement du passeport tunisien à l’étranger est une étape cruciale pour les Tunisiens résidant hors de leur pays, aussi bien pour voyager que pour effectuer des démarches administratives dans le pays où vous vous trouvez. Cet article vous guide à travers les démarches en ligne, le formulaire à remplir, les papiers et timbres nécessaires, ainsi que les délais à prendre en compte pour obtenir un nouveau passeport en temps opportun.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "Les frais de renouvellement pour votre passeport tunisien varient selon le pays où vous effectuez la demande. Pour la France, comptez généralement 27,000 DT pour un passeport enfant et 88,000 DT pour un passeport adulte. Renseignez-vous par téléphone auprès de l’ambassade dont vous dépendez, afin de connaître le montant exact de la procédure. Les délais de traitement varient également de quelques semaines à plusieurs mois en fonction de la période et du lieu de la demande. Si vous en avez la possibilité, essayez de prévoir vos démarches en amont.",
+  "fees": "27,000 DT",
+  "sourceUrl": "https://www.demarches.tn/passeport-tunisien-a-letranger/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "un formulaire de demande de renouvellement de passeport dûment rempli et signé ;",
+      "titleAr": "un formulaire de demande de renouvellement de passeport dûment rempli et signé ;"
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "deux photos d’identité récentes et conformes aux normes en vigueur ;",
+      "titleAr": "deux photos d’identité récentes et conformes aux normes en vigueur ;"
+    },
+    {
+      "sortOrder": 3,
+      "titleFr": "votre passeport actuel (si disponible) ;",
+      "titleAr": "votre passeport actuel (si disponible) ;"
+    },
+    {
+      "sortOrder": 4,
+      "titleFr": "un justificatif de résidence dans le pays où vous effectuez la demande (facture d’électricité, de téléphone, etc.) ;",
+      "titleAr": "un justificatif de résidence dans le pays où vous effectuez la demande (facture d’électricité, de téléphone, etc.) ;"
+    },
+    {
+      "sortOrder": 5,
+      "titleFr": "une photocopie de la carte d’identité nationale tunisienne .",
+      "titleAr": "une photocopie de la carte d’identité nationale tunisienne ."
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "Si votre passeport a été perdu, volé ou détruit, vous devez en demander un nouveau immédiatement et signaler l’incident aux autorités locales et à l’ ambassade ou au consulat tunisien .",
+      "titleAr": "Si votre passeport a été perdu, volé ou détruit, vous devez en demander un nouveau immédiatement et signaler l’incident aux autorités locales et à l’ ambassade ou au consulat tunisien ."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

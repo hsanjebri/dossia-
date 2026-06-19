@@ -1,0 +1,42 @@
+{
+  "slug": "valider-son-mariage-celebre-a-letranger-tout-ce-que-vous-devez-savoir",
+  "titleFr": "Valider son mariage célébré à l’étranger: Tout ce que vous devez savoir",
+  "titleAr": "Valider son mariage célébré à l’étranger: Tout ce que vous devez savoir",
+  "titleTn": null,
+  "descriptionFr": "Vous venez de célébrer votre mariage à l’étranger et vous envisagez de vous installer en Tunisie ? Dans ce cas, vous devrez passer par l’étape de la transcription pour valider cette union conformément aux lois tunisiennes. Cet article vise à fournir toutes les informations nécessaires sur ce processus, que ce soit en termes de validité, de procédures à suivre ou de documents requis . Désormais, vous n’aurez plus besoin de consacrer de longues heures à des recherches fastidieuses pour comprendre cette étape.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "4 mois",
+  "fees": "11 DT",
+  "sourceUrl": "https://www.demarches.tn/valider-mariage-etranger/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "Contrat de mariage original",
+      "titleAr": "Contrat de mariage original"
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "Extrait de naissance des deux parties",
+      "titleAr": "Extrait de naissance des deux parties"
+    },
+    {
+      "sortOrder": 3,
+      "titleFr": "Pièces d’identité des 2 parties",
+      "titleAr": "Pièces d’identité des 2 parties"
+    },
+    {
+      "sortOrder": 4,
+      "titleFr": "Paiement d’un timbre fiscal pour le livret de famille tunisien .",
+      "titleAr": "Paiement d’un timbre fiscal pour le livret de famille tunisien ."
+    }
+  ],
+  "steps": [],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

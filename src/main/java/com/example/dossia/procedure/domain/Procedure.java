@@ -66,10 +66,10 @@ public class Procedure {
     @Column(name = "delivery_mode", length = 100)
     private String deliveryMode;
 
-    @Column(name = "processing_time", length = 100)
+    @Column(name = "processing_time", length = 500)
     private String processingTime;
 
-    @Column(length = 100)
+    @Column(length = 500)
     private String fees;
 
     @Column(name = "source_url", length = 1000)

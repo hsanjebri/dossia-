@@ -1,0 +1,27 @@
+{
+  "slug": "lettre-de-demission-un-depart-en-toute-legalite",
+  "titleFr": "Lettre de démission : Un départ en toute légalité",
+  "titleAr": "Lettre de démission : Un départ en toute légalité",
+  "titleTn": null,
+  "descriptionFr": "La démission est une étape importante dans un parcours professionnel. Que vous quittiez votre emploi pour une nouvelle opportunité, un projet personnel ou un changement de vie, il est essentiel de respecter les règles en vigueur. Que vous soyez en CDI, CDD ou dans la fonction publique, une bonne préparation est essentielle pour éviter les erreurs coûteuses et partir dans les meilleures conditions.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "CIVIL_STATUS",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "Le préavis est obligatoire, sauf dispense écrite.",
+  "fees": "À vérifier",
+  "sourceUrl": "https://www.demarches.tn/lettre-de-demission/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "La lettre écrite est impérative. Une démission verbale n’a aucune valeur légale.",
+      "titleAr": "La lettre écrite est impérative. Une démission verbale n’a aucune valeur légale."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

@@ -37,12 +37,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProcedureService {
 
+    private static final int MAX_SHORT_TEXT = 500;
+    private static final int MAX_STEP_TITLE = 500;
+
     private final ProcedureRepository procedureRepository;
     private final ProcedureMapper procedureMapper;
+    private final ProcedureImportService procedureImportService;
 
-    public ProcedureService(ProcedureRepository procedureRepository, ProcedureMapper procedureMapper) {
+    public ProcedureService(
+            ProcedureRepository procedureRepository,
+            ProcedureMapper procedureMapper,
+            ProcedureImportService procedureImportService) {
         this.procedureRepository = procedureRepository;
         this.procedureMapper = procedureMapper;
+        this.procedureImportService = procedureImportService;
     }
 
     public PagedResponse<ProcedureSummaryDto> listPublished(
@@ -99,7 +107,7 @@ public class ProcedureService {
                 continue;
             }
             try {
-                create(withDraftStatus(procedureRequest), lang);
+                procedureImportService.importOne(withDraftStatus(procedureRequest), lang);
                 created++;
             } catch (ConflictException ex) {
                 skipped++;
@@ -203,9 +211,9 @@ public class ProcedureService {
         procedure.setMinistry(request.ministry());
         procedure.setCategory(request.category());
         procedure.setDifficulty(request.difficulty());
-        procedure.setDeliveryMode(request.deliveryMode());
-        procedure.setProcessingTime(request.processingTime());
-        procedure.setFees(request.fees());
+        procedure.setDeliveryMode(truncate(request.deliveryMode(), 100));
+        procedure.setProcessingTime(truncate(request.processingTime(), MAX_SHORT_TEXT));
+        procedure.setFees(truncate(request.fees(), MAX_SHORT_TEXT));
         procedure.setSourceUrl(request.sourceUrl());
         procedure.setSourceReference(request.sourceReference());
     }
@@ -229,8 +237,8 @@ public class ProcedureService {
                 ProcedureStep step = new ProcedureStep();
                 step.setProcedure(procedure);
                 step.setStepNumber(stepReq.stepNumber());
-                step.setTitleFr(stepReq.titleFr());
-                step.setTitleAr(stepReq.titleAr());
+                step.setTitleFr(truncate(stepReq.titleFr(), MAX_STEP_TITLE));
+                step.setTitleAr(truncate(stepReq.titleAr(), MAX_STEP_TITLE));
                 step.setDescriptionFr(stepReq.descriptionFr());
                 step.setDescriptionAr(stepReq.descriptionAr());
                 procedure.getSteps().add(step);
@@ -278,5 +286,12 @@ public class ProcedureService {
             return SlugUtils.slugify(requestedSlug);
         }
         return SlugUtils.slugify(titleFr);
+    }
+
+    private String truncate(String value, int maxLength) {
+        if (value == null || value.length() <= maxLength) {
+            return value;
+        }
+        return value.substring(0, maxLength - 1) + "…";
     }
 }

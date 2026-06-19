@@ -1,0 +1,98 @@
+{
+  "slug": "comment-obtenir-laevm-pour-la-can-2025-au-maroc",
+  "titleFr": "Comment obtenir l’AEVM pour la CAN 2025 au Maroc",
+  "titleAr": "Comment obtenir l’AEVM pour la CAN 2025 au Maroc",
+  "titleTn": null,
+  "descriptionFr": "L’AEVM pour les Tunisiens devient obligatoire entre septembre 2025 et janvier 2026 pour entrer au Maroc. Cette autorisation électronique remplace l’exemption habituelle de visa durant la CAN 2025.",
+  "descriptionAr": null,
+  "ministry": "À vérifier — source demarches.tn",
+  "category": "VEHICLES",
+  "difficulty": "MODERATE",
+  "deliveryMode": "À vérifier",
+  "processingTime": "6 minutes",
+  "fees": "À vérifier",
+  "sourceUrl": "https://www.demarches.tn/autorisation-electronique-voyage-maroc-aevm-tunisiens/",
+  "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
+  "status": "DRAFT",
+  "documents": [
+    {
+      "sortOrder": 1,
+      "titleFr": "Son passeport tunisien en cours de validité,",
+      "titleAr": "Son passeport tunisien en cours de validité,"
+    },
+    {
+      "sortOrder": 2,
+      "titleFr": "Son AEVM (imprimée ou en version électronique via e-mail ou compte Accès-Maroc).",
+      "titleAr": "Son AEVM (imprimée ou en version électronique via e-mail ou compte Accès-Maroc)."
+    }
+  ],
+  "steps": [
+    {
+      "stepNumber": 1,
+      "titleFr": "✅ L’AEVM obtenue reste valable toute la durée du tournoi , avec la possibilité de voyager entre les villes hôtes.",
+      "titleAr": "✅ L’AEVM obtenue reste valable toute la durée du tournoi , avec la possibilité de voyager entre les villes hôtes."
+    },
+    {
+      "stepNumber": 2,
+      "titleFr": "Étape 1 : Rendez-vous sur acces-maroc.ma .",
+      "titleAr": "Étape 1 : Rendez-vous sur acces-maroc.ma ."
+    },
+    {
+      "stepNumber": 3,
+      "titleFr": "Remplissez le formulaire d’éligibilité (nationalité, type de passeport, pays de résidence, motif du voyage, etc.). Le site vous indique immédiatement si vous devez demander une AEVM.",
+      "titleAr": "Remplissez le formulaire d’éligibilité (nationalité, type de passeport, pays de résidence, motif du voyage, etc.). Le site vous indique immédiatement si vous devez demander une AEVM."
+    },
+    {
+      "stepNumber": 4,
+      "titleFr": "Étape 3 : Remplir ses informations personnelles",
+      "titleAr": "Étape 3 : Remplir ses informations personnelles"
+    },
+    {
+      "stepNumber": 5,
+      "titleFr": "Saisissez vos données (nom, prénom, date de naissance, etc.).",
+      "titleAr": "Saisissez vos données (nom, prénom, date de naissance, etc.)."
+    },
+    {
+      "stepNumber": 6,
+      "titleFr": "Étape 4 : Saisir les informations du passeport",
+      "titleAr": "Étape 4 : Saisir les informations du passeport"
+    },
+    {
+      "stepNumber": 7,
+      "titleFr": "Indiquez les données de votre passeport et mentionnez vos derniers voyages et votre profession.",
+      "titleAr": "Indiquez les données de votre passeport et mentionnez vos derniers voyages et votre profession."
+    },
+    {
+      "stepNumber": 8,
+      "titleFr": "Étape 5 : Ajouter les informations de voyage",
+      "titleAr": "Étape 5 : Ajouter les informations de voyage"
+    },
+    {
+      "stepNumber": 9,
+      "titleFr": "Étape 6 : Télécharger les pièces justificatives",
+      "titleAr": "Étape 6 : Télécharger les pièces justificatives"
+    },
+    {
+      "stepNumber": 10,
+      "titleFr": "Étape 7 : Validation et confirmation",
+      "titleAr": "Étape 7 : Validation et confirmation"
+    },
+    {
+      "stepNumber": 11,
+      "titleFr": "Une fois validée, vous recevez un e-mail confirmant la création de votre dossier.",
+      "titleAr": "Une fois validée, vous recevez un e-mail confirmant la création de votre dossier."
+    },
+    {
+      "stepNumber": 12,
+      "titleFr": "Étape 8 : Suivre sa demande en ligne",
+      "titleAr": "Étape 8 : Suivre sa demande en ligne"
+    },
+    {
+      "stepNumber": 13,
+      "titleFr": "Le délai varie, mais il est conseillé de faire la demande au moins 96h avant le départ.",
+      "titleAr": "Le délai varie, mais il est conseillé de faire la demande au moins 96h avant le départ."
+    }
+  ],
+  "offices": [],
+  "relatedProcedureSlugs": []
+}

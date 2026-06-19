@@ -217,9 +217,11 @@ Registry: [`scraper/sources/sources.yaml`](scraper/sources/sources.yaml)
 cd scraper
 pip install -r requirements.txt
 
-# Scrape demarches.tn (auto)
-python -m sources.demarches_tn --discover --limit 5
-python -m sources.demarches_tn --url https://demarches.tn/some-article/
+# Discover + scrape REAL articles (not category pages)
+python -m sources.demarches_tn --articles --limit 10
+
+# Or one specific procedure
+python -m sources.demarches_tn --url https://www.demarches.tn/carte-identite-tunisienne/
 
 # Import to API
 python import_to_api.py
