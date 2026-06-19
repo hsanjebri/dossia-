@@ -1,0 +1,71 @@
+# Dosya data sources — scrape strategy
+# trust: OFFICIAL | COMMUNITY | OPEN_DATA
+# mode: auto | manual | hybrid
+
+sources:
+  - id: demarches_tn
+    name: Démarches.tn
+    base_url: https://www.demarches.tn
+    trust: COMMUNITY
+    mode: auto
+    robots_ok: true
+    priority: 1
+    notes: >
+      Independent site, not government-official. Clean category structure.
+      All imports must stay DRAFT until human verifies against an official source.
+    categories:
+      - etat-civil
+      - identite
+      - travail-retraite
+      - mobilite
+      - finances
+
+  - id: services_gov_tn
+    name: National Services Portal
+    base_url: https://www.services.gov.tn
+    trust: OFFICIAL
+    mode: hybrid
+    robots_ok: true  # robots.txt only blocks /wp-admin/, not public pages
+    priority: 2
+    notes: >
+      Best official content (organized by life event). Public pages are not
+      disallowed in robots.txt, but prefer manual transcription or official
+      API/partnership for production. Use as verification reference.
+
+  - id: interieur_gov_tn
+    name: Ministry of Interior
+    base_url: https://www.interieur.gov.tn
+    trust: OFFICIAL
+    mode: manual
+    robots_ok: unknown
+    priority: 3
+    notes: >
+      CIN, passport démarches. Page-by-page manual entry; site is news-heavy,
+      not a structured procedure catalog.
+
+  - id: tunisie_gov_tn
+    name: General Government Portal
+    base_url: https://fr.tunisie.gov.tn
+    trust: OFFICIAL
+    mode: manual
+    robots_ok: unknown
+    priority: 4
+    notes: Ministry directory — use to find links, not for detailed steps.
+
+  - id: pm_gov_tn
+    name: Presidency of Government
+    base_url: https://www.pm.gov.tn
+    trust: OFFICIAL
+    mode: manual
+    robots_ok: unknown
+    priority: 5
+    notes: Low structured content — directory only.
+
+  - id: opendata_interieur
+    name: Interior Open Data
+    base_url: https://opendata.interieur.gov.tn
+    trust: OPEN_DATA
+    mode: hybrid
+    robots_ok: true
+    priority: 6
+    notes: Browse datasets manually for anything procedure-relevant (org charts, etc).

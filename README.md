@@ -201,10 +201,28 @@ curl http://localhost:8080/api/v1/procedures/national-id-card-renewal
 
 ## Data ingestion (scraper)
 
+### Source priority
+
+| Source | Type | Mode | Notes |
+|--------|------|------|-------|
+| [demarches.tn](https://demarches.tn) | Community | **Auto scrape** | Primary scraper — always DRAFT + human verify |
+| [services.gov.tn](https://www.services.gov.tn) | Official | Manual / partnership | Best reference content; verify demarches data here |
+| interieur.gov.tn | Official | Manual | CIN, passport — page by page |
+| fr.tunisie.gov.tn | Official | Manual | Ministry directory |
+| opendata.interieur.gov.tn | Open data | Browse datasets | Check for structured procedure data |
+
+Registry: [`scraper/sources/sources.yaml`](scraper/sources/sources.yaml)
+
 ```bash
 cd scraper
 pip install -r requirements.txt
-python import_to_api.py              # import data/draft/*.json as DRAFT
+
+# Scrape demarches.tn (auto)
+python -m sources.demarches_tn --discover --limit 5
+python -m sources.demarches_tn --url https://demarches.tn/some-article/
+
+# Import to API
+python import_to_api.py
 python import_to_api.py --list-drafts
 python import_to_api.py --verify passport-request   # publish after review
 ```

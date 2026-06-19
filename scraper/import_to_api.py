@@ -109,5 +109,14 @@ if __name__ == "__main__":
     try:
         main()
     except requests.RequestException as exc:
+        body = ""
+        if exc.response is not None:
+            body = exc.response.text[:500]
         print(f"API error: {exc}", file=sys.stderr)
+        if body:
+            print(f"Response: {body}", file=sys.stderr)
+        print(
+            "Tip: restart Spring Boot (Ctrl+C then .\\mvnw.cmd spring-boot:run) so admin endpoints load.",
+            file=sys.stderr,
+        )
         sys.exit(1)
