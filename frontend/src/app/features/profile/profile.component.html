@@ -1,0 +1,39 @@
+<div class="page-with-nav">
+  <section class="container profile-page">
+    @if (auth.user(); as user) {
+      <div class="profile-header card">
+        <div class="profile-avatar">{{ user.name.charAt(0).toUpperCase() }}</div>
+        <div>
+          <h1>{{ user.name }}</h1>
+          <p class="muted">{{ user.email }}</p>
+          <span class="profile-badge">Citoyen · Compte gratuit</span>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <article class="card profile-card">
+          <span class="material-symbols-outlined">smart_toy</span>
+          <h3>Assistant Dosya</h3>
+          <p class="muted">Posez une question sur vos démarches administratives.</p>
+          <a routerLink="/chat" class="btn btn--primary">Ouvrir le chat</a>
+        </article>
+        <article class="card profile-card">
+          <span class="material-symbols-outlined">library_books</span>
+          <h3>Procédures</h3>
+          <p class="muted">Parcourez le catalogue vérifié de démarches tunisiennes.</p>
+          <a routerLink="/procedures" class="btn btn--secondary">Voir la bibliothèque</a>
+        </article>
+        <article class="card profile-card">
+          <span class="material-symbols-outlined">help</span>
+          <h3>Aide</h3>
+          <p class="muted">Consultez la FAQ ou contactez-nous.</p>
+          <a routerLink="/faq" class="btn btn--ghost">FAQ</a>
+        </article>
+      </div>
+
+      <button type="button" class="btn btn--ghost profile-logout" (click)="auth.logout()">
+        Se déconnecter
+      </button>
+    }
+  </section>
+</div>

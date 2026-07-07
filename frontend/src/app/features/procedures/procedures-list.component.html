@@ -1,0 +1,83 @@
+<div class="page-with-nav">
+  <section class="container library">
+    <div class="library__header">
+      <h1>Bibliothèque des procédures</h1>
+      <p class="muted">
+        Parcourez le catalogue administratif officiel — clair, simplifié et traduit pour chaque citoyen.
+      </p>
+    </div>
+
+    <div class="search-bar">
+      <span class="material-symbols-outlined search-bar__icon">search</span>
+      <input
+        type="search"
+        [(ngModel)]="query"
+        (keyup.enter)="onSearch()"
+        placeholder="Rechercher (CIN, passeport, résidence…)"
+      />
+      <button type="button" class="btn btn--primary search-bar__btn" (click)="onSearch()">Rechercher</button>
+    </div>
+
+    <div class="chips">
+      <button
+        type="button"
+        class="chip"
+        [class.active]="!selectedCategory"
+        (click)="selectCategory('')"
+      >
+        <span class="material-symbols-outlined">apps</span>
+        Toutes
+      </button>
+      @for (cat of categories; track cat[0]) {
+        <button
+          type="button"
+          class="chip"
+          [class.active]="selectedCategory === cat[0]"
+          (click)="selectCategory(cat[0])"
+        >
+          <span class="material-symbols-outlined">{{ categoryIcon(cat[0]) }}</span>
+          {{ cat[1] }}
+        </button>
+      }
+    </div>
+
+    @if (loading) {
+      <div class="bento-grid skeleton-grid">
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+          <div class="skeleton-card card"></div>
+        }
+      </div>
+    } @else if (error) {
+      <div class="error-box">{{ error }}</div>
+    } @else if (procedures.length === 0) {
+      <div class="empty card">Aucune procédure trouvée.</div>
+    } @else {
+      <div class="bento-grid">
+        @for (item of procedures; track item.slug) {
+          <a [routerLink]="['/procedures', item.slug]" class="procedure-card card">
+            <div class="procedure-card__accent"></div>
+            <div class="procedure-card__top">
+              <span class="procedure-card__icon material-symbols-outlined">{{ categoryIcon(item.category) }}</span>
+              <span class="procedure-card__ministry">{{ item.ministry }}</span>
+            </div>
+            <h3>{{ item.title }}</h3>
+            @if (item.titleAr) {
+              <p class="arabic procedure-card__ar">{{ item.titleAr }}</p>
+            }
+            <div class="procedure-card__footer">
+              <span class="procedure-card__cat">{{ categoryLabel(item.category) }}</span>
+              <div class="procedure-card__meta">
+                @if (item.processingTime) {
+                  <span><span class="material-symbols-outlined">schedule</span> {{ item.processingTime }}</span>
+                }
+                @if (item.fees) {
+                  <span><span class="material-symbols-outlined">payments</span> {{ item.fees }}</span>
+                }
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </section>
+</div>

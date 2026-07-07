@@ -1,0 +1,43 @@
+<div class="auth-page">
+  <div class="auth-page__brand">
+    <a routerLink="/" class="auth-page__logo">Dosya <span class="arabic">دوسيا</span></a>
+    <h1>Stop guessing.<br />Start knowing.</h1>
+    <p class="auth-page__quote arabic">اعرف وين تروح وش تجيب — رفيقك في كل الإجراءات الإدارية.</p>
+    <ul class="auth-page__features">
+      <li><span class="material-symbols-outlined">check_circle</span> Procédures vérifiées</li>
+      <li><span class="material-symbols-outlined">smart_toy</span> Assistant IA grounded</li>
+      <li><span class="material-symbols-outlined">location_on</span> Bureaux et documents</li>
+    </ul>
+  </div>
+
+  <div class="auth-page__form-panel">
+    <div class="auth-card card">
+      <h2>Connexion</h2>
+      <p class="muted">Accédez à vos procédures et à l'assistant Dosya.</p>
+
+      @if (error) {
+        <div class="error-box">{{ error }}</div>
+      }
+
+      <form (submit)="$event.preventDefault(); submit()">
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" [(ngModel)]="email" name="email" autocomplete="email" placeholder="vous@exemple.tn" required />
+        </div>
+        <div class="form-field">
+          <label for="password">Mot de passe</label>
+          <input id="password" type="password" [(ngModel)]="password" name="password" autocomplete="current-password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn--primary btn--block" [disabled]="loading">
+          {{ loading ? 'Connexion…' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <p class="auth-card__footer muted">
+        Pas encore de compte ?
+        <a routerLink="/auth/register">Créer un compte gratuit</a>
+      </p>
+      <a routerLink="/" class="auth-card__back">← Retour à l'accueil</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<div class="page-with-nav">
+  <section class="container faq-page">
+    <p class="eyebrow">Support</p>
+    <h1>Questions fréquentes</h1>
+    <p class="muted faq-intro">Tout ce que vous devez savoir sur Dosya et nos procédures vérifiées.</p>
+
+    <div class="faq-list">
+      @for (item of items; track item.question; let i = $index) {
+        <article class="faq-item card" [class.faq-item--open]="openIndex === i">
+          <button type="button" class="faq-item__trigger" (click)="toggle(i)">
+            <span>{{ item.question }}</span>
+            <span class="material-symbols-outlined">{{ openIndex === i ? 'expand_less' : 'expand_more' }}</span>
+          </button>
+          @if (openIndex === i) {
+            <div class="faq-item__body">
+              <p>{{ item.answer }}</p>
+            </div>
+          }
+        </article>
+      }
+    </div>
+
+    <div class="faq-cta card">
+      <h2>Besoin d'aide sur une démarche ?</h2>
+      <p class="muted">Posez votre question à l'assistant Dosya — réponse grounded en quelques secondes.</p>
+      <a routerLink="/chat" class="btn btn--primary">Ouvrir l'assistant</a>
+    </div>
+  </section>
+</div>

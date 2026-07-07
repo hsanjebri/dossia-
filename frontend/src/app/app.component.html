@@ -1,0 +1,9 @@
+@if (!isAuthRoute()) {
+  <app-navbar />
+}
+<main class="app-main" [class.app-main--auth]="isAuthRoute()" [class.app-main--chat]="isChatRoute()">
+  <router-outlet />
+</main>
+@if (!isAuthRoute() && !isChatRoute()) {
+  <app-footer />
+}

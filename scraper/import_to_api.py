@@ -53,8 +53,35 @@ def load_json_files(directory: Path) -> list[dict]:
     return procedures
 
 
-def import_procedures(api_url: str, procedures: list[dict]) -> dict:
-    response = requests.post(
+def build_session(api_url: str) -> requests.Session:
+    """Create an authenticated session. Admin endpoints require an ADMIN cookie."""
+    session = requests.Session()
+    email = os.environ.get("DOSSIA_ADMIN_EMAIL")
+    password = os.environ.get("DOSSIA_ADMIN_PASSWORD")
+    if not email or not password:
+        print(
+            "Warning: DOSSIA_ADMIN_EMAIL / DOSSIA_ADMIN_PASSWORD not set. "
+            "Admin endpoints will reject the request (401/403).",
+            file=sys.stderr,
+        )
+        return session
+
+    response = session.post(
+        f"{api_url}/api/v1/auth/login",
+        json={"email": email, "password": password},
+        timeout=30,
+    )
+    if response.status_code >= 400:
+        raise SystemExit(
+            f"Admin login failed ({response.status_code}). "
+            "Ensure the user exists and its email is listed in ADMIN_EMAILS."
+        )
+    print(f"Authenticated as admin: {email}")
+    return session
+
+
+def import_procedures(session: requests.Session, api_url: str, procedures: list[dict]) -> dict:
+    response = session.post(
         f"{api_url}/api/v1/admin/procedures/import",
         json={"procedures": procedures},
         timeout=60,
@@ -63,8 +90,8 @@ def import_procedures(api_url: str, procedures: list[dict]) -> dict:
     return response.json()
 
 
-def list_drafts(api_url: str) -> dict:
-    response = requests.get(
+def list_drafts(session: requests.Session, api_url: str) -> dict:
+    response = session.get(
         f"{api_url}/api/v1/admin/procedures",
         params={"status": "DRAFT", "size": 100},
         timeout=30,
@@ -73,14 +100,14 @@ def list_drafts(api_url: str) -> dict:
     return response.json()
 
 
-def verify_by_slug(api_url: str, slug: str) -> None:
-    drafts = list_drafts(api_url)
+def verify_by_slug(session: requests.Session, api_url: str, slug: str) -> None:
+    drafts = list_drafts(session, api_url)
     match = next((item for item in drafts["content"] if item["slug"] == slug), None)
     if not match:
         raise SystemExit(f"No DRAFT procedure found with slug: {slug}")
 
     procedure_id = match["id"]
-    response = requests.patch(
+    response = session.patch(
         f"{api_url}/api/v1/admin/procedures/{procedure_id}/verify",
         timeout=30,
     )
@@ -96,14 +123,16 @@ def main() -> None:
     parser.add_argument("--list-drafts", action="store_true", help="List draft procedures")
     args = parser.parse_args()
 
+    session = build_session(args.api_url)
+
     if args.list_drafts:
-        result = list_drafts(args.api_url)
+        result = list_drafts(session, args.api_url)
         for item in result["content"]:
             print(f"- {item['slug']} ({item['id']})")
         return
 
     if args.verify:
-        verify_by_slug(args.api_url, args.verify)
+        verify_by_slug(session, args.api_url, args.verify)
         return
 
     if args.file:
@@ -114,7 +143,7 @@ def main() -> None:
     if not procedures:
         raise SystemExit(f"No JSON files found in {DRAFT_DIR}")
 
-    result = import_procedures(args.api_url, procedures)
+    result = import_procedures(session, args.api_url, procedures)
     print(
         f"Import complete: created={result['created']} "
         f"skipped={result['skipped']} errors={len(result['errors'])}"

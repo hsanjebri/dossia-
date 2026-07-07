@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0');
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+  --primary: #7e5700;
+  --primary-container: #c8922a;
+  --primary-fixed: #ffdeab;
+  --secondary: #446274;
+  --secondary-container: #c7e7fc;
+  --background: #fef9f1;
+  --surface: #ffffff;
+  --surface-container: #f2ede5;
+  --surface-container-low: #f8f3eb;
+  --surface-container-highest: #e7e2da;
+  --surface-variant: #e7e2da;
+  --on-background: #1d1c17;
+  --on-surface: #1d1c17;
+  --text-main: #1c1c1c;
+  --text-muted: #6b6156;
+  --border-gold: rgba(200, 146, 42, 0.3);
+  --outline-variant: #d4c4b0;
+  --success: #3b6d11;
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+  --container-max: 1200px;
+  --radius-sm: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-arabic: 'Noto Kufi Arabic', sans-serif;
+  --nav-height: 64px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--on-background);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
+.arabic {
+  font-family: var(--font-arabic);
+  direction: rtl;
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  font-family: inherit;
+
+  &--primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 14px rgba(126, 87, 0, 0.25);
+
+    &:hover:not(:disabled) {
+      background: var(--primary-container);
+    }
+  }
+
+  &--secondary {
+    background: white;
+    color: var(--primary);
+    border: 1px solid var(--border-gold);
+
+    &:hover {
+      background: var(--primary-fixed);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--outline-variant);
+  }
+
+  &--block {
+    width: 100%;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--outline-variant);
+  border-radius: 999px;
+  background: white;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  &.active,
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-fixed);
+  }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-xl);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin: 0 0 0.5rem;
+}
+
+.section-subtitle {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.page-with-nav {
+  padding-top: calc(var(--nav-height) + 1.5rem);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--on-surface);
+  }
+
+  input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-lg);
+    font: inherit;
+    background: white;
+
+    &:focus {
+      outline: 2px solid var(--primary-fixed);
+      border-color: var(--primary);
+    }
+  }
+}
+
+.error-box {
+  background: var(--error-container);
+  color: var(--on-error-container);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.bento-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.zellige-divider {
+  height: 12px;
+  width: 100%;
+  background-image: linear-gradient(
+    45deg,
+    transparent 45%,
+    rgba(200, 146, 42, 0.12) 45%,
+    rgba(200, 146, 42, 0.12) 55%,
+    transparent 55%
+  );
+  background-size: 16px 16px;
+}

@@ -1,5 +1,7 @@
 package com.example.dossia.procedure.controller;
 
+import com.example.dossia.chat.ProcedureEmbeddingService;
+import com.example.dossia.chat.dto.EmbedAllResultDto;
 import com.example.dossia.common.Language;
 import com.example.dossia.procedure.domain.ProcedureCategory;
 import com.example.dossia.procedure.domain.ProcedureStatus;
@@ -29,9 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminProcedureController {
 
     private final ProcedureService procedureService;
+    private final ProcedureEmbeddingService procedureEmbeddingService;
 
-    public AdminProcedureController(ProcedureService procedureService) {
+    public AdminProcedureController(
+            ProcedureService procedureService, ProcedureEmbeddingService procedureEmbeddingService) {
         this.procedureService = procedureService;
+        this.procedureEmbeddingService = procedureEmbeddingService;
     }
 
     @GetMapping
@@ -70,6 +75,19 @@ public class AdminProcedureController {
     @PatchMapping("/{id}/verify")
     public ProcedureDetailDto verify(@PathVariable UUID id, @RequestParam(defaultValue = "fr") String lang) {
         return procedureService.verify(id, parseLang(lang));
+    }
+
+    @PostMapping("/{id}/embed")
+    @ResponseStatus(HttpStatus.OK)
+    public void embed(@PathVariable UUID id) {
+        procedureEmbeddingService.embedProcedure(id);
+    }
+
+    @PostMapping("/embed-all")
+    @ResponseStatus(HttpStatus.OK)
+    public EmbedAllResultDto embedAll() {
+        var result = procedureEmbeddingService.embedAllPublishedMissingDetailed();
+        return new EmbedAllResultDto(result.embedded(), result.skipped(), result.errors());
     }
 
     private Language parseLang(String lang) {

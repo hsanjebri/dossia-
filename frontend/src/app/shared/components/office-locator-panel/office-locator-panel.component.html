@@ -1,0 +1,56 @@
+<section class="locator card">
+  <div class="locator__header">
+    <span class="material-symbols-outlined">location_on</span>
+    <div>
+      <h3>{{ title }}</h3>
+      @if (userLocation) {
+        <p class="muted">Triés par distance depuis votre position</p>
+      }
+    </div>
+  </div>
+
+  @if (offices.length) {
+    <app-office-map
+      [userLocation]="userLocation"
+      [offices]="offices"
+      [selectedOffice]="selectedOffice"
+      [route]="route"
+    />
+
+    <div class="locator__list">
+      @for (office of offices; track office.id) {
+        <article
+          class="locator__item"
+          [class.locator__item--active]="selectedOffice?.id === office.id"
+          (click)="selectOffice(office)"
+        >
+          <div class="locator__item-top">
+            <strong>{{ office.name }}</strong>
+            <span class="locator__badge">{{ officeTypeLabel(office.officeType) }}</span>
+          </div>
+          <p class="muted">{{ office.address }}@if (office.city) {, {{ office.city }}}</p>
+          <div class="locator__meta">
+            <span><span class="material-symbols-outlined">near_me</span> {{ office.distanceKm }} km</span>
+            @if (office.hours) {
+              <span><span class="material-symbols-outlined">schedule</span> {{ office.hours }}</span>
+            }
+          </div>
+          @if (route && selectedOffice?.id === office.id) {
+            <p class="locator__route">
+              <span class="material-symbols-outlined">directions</span>
+              ~{{ route.durationMin }} min · {{ route.distanceKm }} km en voiture
+            </p>
+          }
+          <div class="locator__actions">
+            <button type="button" class="btn btn--secondary" (click)="selectOffice(office); $event.stopPropagation()">
+              Voir l'itinéraire
+            </button>
+            <button type="button" class="btn btn--ghost" (click)="openExternal(office.mapsUrl); $event.stopPropagation()">
+              Ouvrir dans Maps
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

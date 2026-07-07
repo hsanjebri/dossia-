@@ -1,0 +1,214 @@
+<div class="page-with-nav">
+  @if (loading) {
+    <div class="container"><p class="muted">Chargement…</p></div>
+  } @else if (error || !procedure) {
+    <div class="container">
+      <div class="error-box">{{ error }}</div>
+      <a routerLink="/procedures" class="back-link">← Retour à la liste</a>
+    </div>
+  } @else {
+    <div class="container detail">
+      <nav class="breadcrumbs">
+        <a routerLink="/">Accueil</a>
+        <span class="material-symbols-outlined">chevron_right</span>
+        <a routerLink="/procedures">Procédures</a>
+        <span class="material-symbols-outlined">chevron_right</span>
+        <span>{{ procedure.title }}</span>
+      </nav>
+
+      <div class="detail__layout">
+        <main class="detail__main">
+          <header class="detail-header">
+            <span class="badge">
+              <span class="material-symbols-outlined">{{ categoryIcon(procedure.category) }}</span>
+              {{ categoryLabel(procedure.category) }}
+            </span>
+            <h1>{{ procedure.title }}</h1>
+            @if (procedure.titleAr) {
+              <p class="arabic detail-header__ar">{{ procedure.titleAr }}</p>
+            }
+            <p class="ministry">{{ procedure.ministry }}</p>
+          </header>
+
+          @if (procedure.description) {
+            <section class="panel card">
+              <h2><span class="material-symbols-outlined">info</span> Description</h2>
+              <p>{{ procedure.description }}</p>
+            </section>
+          }
+
+          @if (procedure.documents.length) {
+            <section class="panel card">
+              <h2><span class="material-symbols-outlined">checklist</span> Documents requis</h2>
+              <ul class="checklist">
+                @for (doc of procedure.documents; track doc.sortOrder) {
+                  <li>
+                    <label>
+                      <input
+                        type="checkbox"
+                        [checked]="isDocChecked(doc.sortOrder)"
+                        (change)="toggleDoc(doc.sortOrder)"
+                      />
+                      <span>
+                        <strong>{{ doc.title }}</strong>
+                        @if (doc.titleAr) {
+                          <span class="arabic doc-ar">{{ doc.titleAr }}</span>
+                        }
+                        @if (doc.description) {
+                          <small class="muted">{{ doc.description }}</small>
+                        }
+                      </span>
+                    </label>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+
+          @if (procedure.steps.length) {
+            <section class="panel card">
+              <h2><span class="material-symbols-outlined">route</span> Étapes</h2>
+              <ol class="timeline">
+                @for (step of procedure.steps; track step.stepNumber) {
+                  <li>
+                    <div class="timeline__marker">{{ step.stepNumber }}</div>
+                    <div class="timeline__content">
+                      <strong>{{ step.title }}</strong>
+                      @if (step.titleAr) {
+                        <p class="arabic">{{ step.titleAr }}</p>
+                      }
+                      @if (step.description) {
+                        <p class="muted">{{ step.description }}</p>
+                      }
+                    </div>
+                  </li>
+                }
+              </ol>
+            </section>
+          }
+
+          @if (procedure.relatedProcedures.length) {
+            <section class="panel">
+              <h2 class="section-title">Procédures liées</h2>
+              <div class="related-grid">
+                @for (rel of procedure.relatedProcedures; track rel.slug) {
+                  <a [routerLink]="['/procedures', rel.slug]" class="related-card card">
+                    <span class="material-symbols-outlined">description</span>
+                    <span>{{ rel.title }}</span>
+                  </a>
+                }
+              </div>
+            </section>
+          }
+        </main>
+
+        <aside class="detail__sidebar">
+          <div class="sidebar-card card">
+            <h3>Résumé</h3>
+            @if (procedure.fees) {
+              <div class="stat-row">
+                <span class="material-symbols-outlined">payments</span>
+                <div><small>Frais</small><strong>{{ procedure.fees }}</strong></div>
+              </div>
+            }
+            @if (procedure.processingTime) {
+              <div class="stat-row">
+                <span class="material-symbols-outlined">schedule</span>
+                <div><small>Délai</small><strong>{{ procedure.processingTime }}</strong></div>
+              </div>
+            }
+            @if (procedure.deliveryMode) {
+              <div class="stat-row">
+                <span class="material-symbols-outlined">local_shipping</span>
+                <div><small>Mode</small><strong>{{ procedure.deliveryMode }}</strong></div>
+              </div>
+            }
+          </div>
+
+          @if (procedure.offices.length || nearbyOffices.length) {
+            <div class="sidebar-card card">
+              <h3><span class="material-symbols-outlined">location_on</span> Bureaux</h3>
+
+              @if (!geo.location()) {
+                <p class="muted office-loc-hint">Activez votre position pour voir la carte et l'itinéraire.</p>
+                <button type="button" class="btn btn--secondary btn--block" (click)="enableLocation()">
+                  <span class="material-symbols-outlined">my_location</span>
+                  Ma position
+                </button>
+              }
+
+              @for (office of procedure.offices; track office.name) {
+                <div class="office">
+                  <strong>{{ office.name }}</strong>
+                  <p class="muted">{{ office.address }}</p>
+                  @if (office.city) {
+                    <p class="muted">{{ office.city }}@if (office.governorate) {, {{ office.governorate }}}</p>
+                  }
+                  @if (office.hours) {
+                    <p class="office-hours"><span class="material-symbols-outlined">schedule</span> {{ office.hours }}</p>
+                  }
+                </div>
+              }
+
+              @if (officesLoading) {
+                <p class="muted">Recherche des bureaux proches…</p>
+              } @else if (nearbyOffices.length) {
+                <app-office-locator-panel
+                  [offices]="nearbyOffices"
+                  [userLocation]="geo.location()"
+                  [selectedOffice]="selectedOffice"
+                  [route]="activeRoute"
+                  title="Bureaux les plus proches"
+                  (officeSelected)="onOfficeSelected($event)"
+                />
+              }
+            </div>
+          } @else {
+            <div class="sidebar-card card">
+              <h3><span class="material-symbols-outlined">location_on</span> Bureaux</h3>
+              <p class="muted office-loc-hint">Activez votre position pour trouver le bureau le plus proche.</p>
+              <button type="button" class="btn btn--secondary btn--block" (click)="enableLocation()">
+                <span class="material-symbols-outlined">my_location</span>
+                Trouver un bureau près de moi
+              </button>
+              @if (officesLoading) {
+                <p class="muted">Recherche…</p>
+              } @else if (nearbyOffices.length) {
+                <app-office-locator-panel
+                  [offices]="nearbyOffices"
+                  [userLocation]="geo.location()"
+                  [selectedOffice]="selectedOffice"
+                  [route]="activeRoute"
+                  (officeSelected)="onOfficeSelected($event)"
+                />
+              }
+            </div>
+          }
+
+          <div class="sidebar-card card sidebar-cta">
+            <h3>Besoin d'aide ?</h3>
+            <p class="muted">Posez une question à l'assistant sur cette procédure.</p>
+            <a [routerLink]="['/chat']" [queryParams]="{ q: procedure.title }" class="btn btn--primary btn--block">
+              Ouvrir le chat
+            </a>
+          </div>
+
+          <div class="sidebar-card card panel--source">
+            <h3>Source &amp; vérification</h3>
+            @if (procedure.sourceUrl) {
+              <a [href]="procedure.sourceUrl" target="_blank" rel="noopener" class="source-link">
+                Voir la source <span class="material-symbols-outlined">open_in_new</span>
+              </a>
+            }
+            @if (procedure.lastVerifiedAt) {
+              <p class="verified">
+                <span class="material-symbols-outlined">verified</span>
+                Vérifié le {{ procedure.lastVerifiedAt | date: 'mediumDate' }}
+              </p>
+            }
+          </div>
+        </aside>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,218 @@
+<div class="chat-page page-with-nav">
+  <button type="button" class="chat-mobile-toggle" (click)="toggleSidebar()">
+    <span class="material-symbols-outlined">menu</span>
+    Historique
+  </button>
+
+  <aside class="chat-sidebar" [class.chat-sidebar--open]="sidebarOpen">
+    <div class="chat-sidebar__header">
+      <a routerLink="/" class="chat-sidebar__brand">Dosya <span class="arabic">دوسيا</span></a>
+      <button type="button" class="btn btn--primary btn--block chat-new" (click)="newChat()">
+        <span class="material-symbols-outlined">add</span>
+        Nouvelle conversation
+      </button>
+    </div>
+
+    <p class="chat-sidebar__label">Historique</p>
+    <div class="chat-sessions">
+      @if (historyLoading) {
+        <p class="muted chat-sessions__empty">Chargement…</p>
+      } @else if (sessions.length === 0) {
+        <p class="muted chat-sessions__empty">Aucune conversation pour l'instant.</p>
+      } @else {
+        @for (session of sessions; track session.id) {
+          <div
+            class="chat-session"
+            [class.chat-session--active]="currentSessionId === session.id"
+            (click)="openSession(session)"
+            (keydown.enter)="openSession(session)"
+            tabindex="0"
+            role="button"
+          >
+            <span class="material-symbols-outlined">chat</span>
+            <div class="chat-session__body">
+              <strong>{{ session.title }}</strong>
+              <span class="muted">{{ session.preview }}</span>
+              <span class="chat-session__date">{{ session.updatedAt | date: 'short' }}</span>
+            </div>
+            <button
+              type="button"
+              class="chat-session__delete"
+              title="Supprimer"
+              (click)="deleteSession($event, session.id)"
+            >
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="chat-sidebar__footer">
+      @if (auth.user(); as user) {
+        <a routerLink="/profile" class="chat-user">
+          <div class="chat-user__avatar">{{ user.name.charAt(0).toUpperCase() }}</div>
+          <div>
+            <strong>{{ user.name }}</strong>
+            <span class="muted">{{ user.email }}</span>
+          </div>
+        </a>
+      } @else {
+        <p class="muted chat-sidebar__hint">Connectez-vous pour synchroniser l'historique sur tous vos appareils.</p>
+        <a routerLink="/auth/login" class="btn btn--secondary btn--block">Se connecter</a>
+      }
+    </div>
+  </aside>
+
+  <section class="chat-main">
+    <div class="chat-toolbar">
+      <button
+        type="button"
+        class="toolbar-btn"
+        [class.toolbar-btn--active]="geo.location()"
+        (click)="enableLocation()"
+        title="Activer ma position pour les bureaux proches"
+      >
+        <span class="material-symbols-outlined">my_location</span>
+        @if (geo.location()) {
+          Position activée
+        } @else if (geo.loading()) {
+          Localisation…
+        } @else {
+          Ma position
+        }
+      </button>
+      @if (voice.speechSupported) {
+        <button
+          type="button"
+          class="toolbar-btn"
+          [class.toolbar-btn--active]="voice.voiceMode()"
+          (click)="voice.toggleVoiceMode()"
+          title="Assistant vocal — lire les réponses à voix haute"
+        >
+          <span class="material-symbols-outlined">record_voice_over</span>
+          Vocal {{ voice.voiceMode() ? 'ON' : 'OFF' }}
+        </button>
+      }
+      @if (voice.isSpeaking()) {
+        <button type="button" class="toolbar-btn" (click)="voice.stopSpeaking()">
+          <span class="material-symbols-outlined">stop_circle</span>
+          Arrêter la lecture
+        </button>
+      }
+    </div>
+
+    @if (messages.length <= 1 && !loading) {
+      <div class="chat-welcome">
+        <div class="chat-welcome__icon">
+          <span class="material-symbols-outlined">smart_toy</span>
+        </div>
+        <h1>Assistant Dosya</h1>
+        <p class="muted">Réponses basées sur des procédures vérifiées — jamais inventées.</p>
+        <div class="chat-chips">
+          @for (s of suggestions; track s) {
+            <button type="button" class="chip" (click)="useSuggestion(s)">{{ s }}</button>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="messages" #messagesContainer>
+      @for (msg of messages; track $index) {
+        <div class="message" [class.message--user]="msg.role === 'user'">
+          @if (msg.role === 'assistant') {
+            <div class="message__avatar">D</div>
+          }
+          <div class="message__bubble">
+            <p class="message__text">{{ msg.content }}</p>
+            @if (msg.role === 'assistant' && voice.speechSupported) {
+              <button type="button" class="message__speak" (click)="speakMessage(msg.content)" title="Écouter">
+                <span class="material-symbols-outlined">volume_up</span>
+              </button>
+            }
+            @if (msg.sources?.length) {
+              <div class="sources">
+                <p class="sources__title">
+                  <span class="material-symbols-outlined">source</span>
+                  Sources utilisées
+                </p>
+                @for (src of msg.sources; track src.id) {
+                  <a [routerLink]="['/procedures', src.slug]" class="source-card">
+                    <strong>{{ src.title }}</strong>
+                    @if (src.lastVerifiedAt) {
+                      <span>Vérifié {{ src.lastVerifiedAt | date: 'shortDate' }}</span>
+                    }
+                  </a>
+                }
+              </div>
+            }
+            @if (msg.nearbyOffices?.length) {
+              <app-office-locator-panel
+                [offices]="msg.nearbyOffices!"
+                [userLocation]="geo.location()"
+                [selectedOffice]="selectedOffice"
+                [route]="activeRoute"
+                title="Où aller — bureaux les plus proches"
+                (officeSelected)="onOfficeSelected($event)"
+              />
+            }
+          </div>
+        </div>
+      }
+
+      @if (loading) {
+        <div class="message message--thinking">
+          <div class="message__avatar message__avatar--pulse">D</div>
+          <div class="message__bubble message__bubble--thinking" [class.message__bubble--done]="thinkingDone">
+            <div class="thinking-header">
+              <span class="material-symbols-outlined thinking-icon" [class.spin]="!thinkingDone">psychology</span>
+              <strong>{{ thinkingLabel() }}</strong>
+            </div>
+            <div class="thinking-steps">
+              @for (label of thinkingLabels; track label; let i = $index) {
+                <div class="thinking-step" [class.thinking-step--done]="thinkingDone || i < thinkingStep" [class.thinking-step--current]="!thinkingDone && i === thinkingStep">
+                  <span class="thinking-step__dot"></span>
+                  <span>{{ label }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (geo.error()) {
+      <div class="error-banner">{{ geo.error() }}</div>
+    }
+
+    @if (error) {
+      <div class="error-banner">{{ error }}</div>
+    }
+
+    <form class="composer card" (submit)="$event.preventDefault(); send()">
+      @if (voice.speechSupported) {
+        <button
+          type="button"
+          class="composer__mic"
+          [class.composer__mic--active]="voice.isListening()"
+          (click)="onVoiceInput()"
+          title="Parler"
+          [disabled]="loading"
+        >
+          <span class="material-symbols-outlined">{{ voice.isListening() ? 'mic' : 'mic_none' }}</span>
+        </button>
+      }
+      <input
+        type="text"
+        [(ngModel)]="input"
+        name="message"
+        placeholder="Posez votre question en français ou en arabe…"
+        [disabled]="loading"
+        autocomplete="off"
+      />
+      <button type="submit" class="btn btn--primary composer__send" [disabled]="loading || !input.trim()">
+        <span class="material-symbols-outlined">send</span>
+      </button>
+    </form>
+  </section>
+</div>

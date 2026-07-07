@@ -3,15 +3,15 @@ services:
     image: pgvector/pgvector:pg16
     container_name: dossia-postgres
     environment:
-      POSTGRES_DB: dossia
-      POSTGRES_USER: dossia
-      POSTGRES_PASSWORD: dossia
+      POSTGRES_DB: ${POSTGRES_DB:-dossia}
+      POSTGRES_USER: ${POSTGRES_USER:-dossia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dossia}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - dossia_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dossia -d dossia"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dossia} -d ${POSTGRES_DB:-dossia}"]
       interval: 5s
       timeout: 5s
       retries: 5

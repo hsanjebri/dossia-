@@ -1,0 +1,12 @@
+.app-main {
+  min-height: calc(100vh - var(--nav-height));
+
+  &--auth {
+    min-height: 100vh;
+  }
+
+  &--chat {
+    min-height: 100vh;
+    padding-top: 0;
+  }
+}

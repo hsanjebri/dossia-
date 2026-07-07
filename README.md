@@ -39,7 +39,7 @@ Design mockups live in [`design--/`](design--/) (open the HTML files in a browse
 
 <p align="center">
   <img src="docs/images/chat.png" alt="Mobile-first civic assistant interface" width="720"/>
-  <br/><em>AI assistant (planned) — grounded answers with sources, never invented facts</em>
+  <br/><em>AI assistant — grounded answers with sources, never invented facts</em>
 </p>
 
 Full Stitch screens: `design--/Image 13.html` (library), `Image 7.html` (detail), `Image 11.html` (chat).
@@ -57,17 +57,27 @@ flowchart LR
 
     subgraph backend [Spring Boot API]
         API[REST API]
-        RAG[RAG Chat - planned]
+        Auth[Auth - JWT cookies]
+        RAG[RAG Chat - Gemini]
+        Office[Office Locator]
     end
 
     subgraph data [PostgreSQL + pgvector]
-        DB[(procedures)]
+        DB[(procedures + embeddings)]
+        Users[(users)]
+        Chats[(chat history)]
     end
 
     Web --> API
+    Web --> Auth
+    Web --> RAG
+    Web --> Office
     Scraper --> API
     API --> DB
+    Auth --> Users
     RAG --> DB
+    RAG --> Chats
+    Office --> DB
 ```
 
 ---
@@ -79,8 +89,10 @@ flowchart LR
 | Backend | Spring Boot 4, Java 21 |
 | Database | PostgreSQL 17 + pgvector |
 | Migrations | Flyway |
-| Frontend | Angular (planned) |
-| AI / RAG | Gemini + pgvector (planned) |
+| Frontend | Angular 19 (standalone components) |
+| AI / RAG | Gemini 2.5 Flash + `gemini-embedding-001` over pgvector |
+| Auth | JWT in HttpOnly cookies, Spring Security |
+| Maps | Leaflet + OSRM routing |
 | Scraper | Python 3, BeautifulSoup, Requests |
 
 ---
@@ -103,15 +115,20 @@ flowchart LR
 dossia/
 ├── src/main/java/com/example/dossia/
 │   ├── procedure/          # Domain, API, service layer
+│   ├── auth/               # JWT cookie auth, users, security
+│   ├── chat/               # Gemini RAG, retrieval, chat history
+│   ├── office/             # Office locator (nearest service point)
 │   ├── common/             # Exceptions, health check
-│   └── config/             # CORS
-├── src/main/resources/db/migration/   # Flyway SQL
+│   └── config/             # CORS, auth & gemini properties, beans
+├── src/main/resources/db/migration/   # Flyway SQL (V1–V8)
+├── frontend/               # Angular 19 app (see frontend/README.md)
 ├── scraper/                # Data ingestion pipeline
 │   ├── data/draft/         # JSON procedures awaiting import
-│   ├── import_to_api.py    # Push drafts to admin API
+│   ├── import_to_api.py    # Push/verify drafts (authenticates as admin)
 │   └── sources/            # Per-ministry scrapers
 ├── design--/               # Stitch UI HTML mockups
-└── docker-compose.yml      # Optional Postgres + pgvector
+├── .env.example            # Copy to .env (shared by app + compose)
+└── docker-compose.yml      # Postgres + pgvector
 ```
 
 ---
@@ -122,41 +139,34 @@ dossia/
 
 - Java 21+
 - Maven (or use `./mvnw`)
-- PostgreSQL 17 with [pgvector](https://github.com/pgvector/pgvector)
+- PostgreSQL 17 with [pgvector](https://github.com/pgvector/pgvector) (or `docker compose up`)
+- Node 20+ and npm (for the Angular frontend)
 - Python 3.11+ (for scraper)
+- A Gemini API key (for chat + embeddings)
 
-### 1. Create the database
+### 1. Configure environment
 
-In pgAdmin or `psql` as superuser:
+Copy the example env file and fill in your values (this file is read by **both** Spring Boot and docker-compose):
+
+```bash
+cp .env.example .env
+# then edit .env: GEMINI_API_KEY, JWT_SECRET (min 32 chars), ADMIN_EMAILS, DB creds
+```
+
+### 2. Start the database
+
+Either use Docker:
+
+```bash
+docker compose up -d
+```
+
+Or create it manually in `psql` as superuser (the `vector` extension is also created by Flyway migration V2):
 
 ```sql
 CREATE DATABASE dossia;
 \c dossia
 CREATE EXTENSION IF NOT EXISTS vector;
-```
-
-### 2. Configure credentials
-
-Copy the example local config and set your Postgres password:
-
-```bash
-cp src/main/resources/application-local.yml.example src/main/resources/application-local.yml
-```
-
-Edit `application-local.yml`:
-
-```yaml
-spring:
-  datasource:
-    password: your-postgres-password
-```
-
-Or use environment variables:
-
-```bash
-export POSTGRES_USER=postgres
-export POSTGRES_PASSWORD=your-password
-export POSTGRES_DB=dossia
 ```
 
 ### 3. Run the API
@@ -165,15 +175,30 @@ export POSTGRES_DB=dossia
 ./mvnw spring-boot:run
 ```
 
-Flyway creates tables and seeds 5 sample procedures on first run.
+Flyway creates tables and seeds sample procedures on first run.
 
-### 4. Verify
+### 4. Run the frontend
+
+```bash
+cd frontend
+npm install
+npm start        # http://localhost:4200
+```
+
+### 5. Verify
 
 ```bash
 curl http://localhost:8080/api/v1/health
 curl http://localhost:8080/api/v1/procedures
 curl http://localhost:8080/api/v1/procedures/national-id-card-renewal
 ```
+
+### 6. Become an admin
+
+Admin endpoints (`/api/v1/admin/**`) require the `ADMIN` role. Put your email in
+`ADMIN_EMAILS` (comma-separated) in `.env`, then register/login with that email — it's
+promoted automatically. The scraper authenticates using `DOSSIA_ADMIN_EMAIL` /
+`DOSSIA_ADMIN_PASSWORD`.
 
 ---
 
@@ -187,8 +212,27 @@ curl http://localhost:8080/api/v1/procedures/national-id-card-renewal
 | `GET` | `/api/v1/procedures` | List published procedures (`?q=&category=&lang=fr`) |
 | `GET` | `/api/v1/procedures/categories` | Category filter chips |
 | `GET` | `/api/v1/procedures/{slug}` | Full detail (docs, steps, offices) |
+| `GET` | `/api/v1/offices/nearest` | Nearest office (`?lat=&lng=&procedureSlug=&q=`) |
+| `POST` | `/api/v1/chat` | RAG chat (`?lang=fr`) — grounded, with sources |
 
-### Admin (ingestion)
+### Auth
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/auth/register` | Register (sets HttpOnly cookie) |
+| `POST` | `/api/v1/auth/login` | Login (sets HttpOnly cookie) |
+| `POST` | `/api/v1/auth/logout` | Clear cookie |
+| `GET` | `/api/v1/auth/me` | Current user (authenticated) |
+
+### Chat history (authenticated)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/chat/sessions` | List the user's chat sessions |
+| `GET` | `/api/v1/chat/sessions/{id}` | Session detail with messages |
+| `DELETE` | `/api/v1/chat/sessions/{id}` | Delete a session |
+
+### Admin (ingestion) — requires `ADMIN` role
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -196,6 +240,7 @@ curl http://localhost:8080/api/v1/procedures/national-id-card-renewal
 | `POST` | `/api/v1/admin/procedures` | Create procedure |
 | `POST` | `/api/v1/admin/procedures/import` | Bulk import JSON |
 | `PATCH` | `/api/v1/admin/procedures/{id}/verify` | Verify & publish |
+| `POST` | `/api/v1/admin/procedures/embed-all` | Embed published procedures missing vectors |
 
 ---
 
@@ -223,10 +268,16 @@ python -m sources.demarches_tn --articles --limit 10
 # Or one specific procedure
 python -m sources.demarches_tn --url https://www.demarches.tn/carte-identite-tunisienne/
 
-# Import to API
+# Import to API (requires admin creds in .env: DOSSIA_ADMIN_EMAIL / DOSSIA_ADMIN_PASSWORD)
 python import_to_api.py
 python import_to_api.py --list-drafts
 python import_to_api.py --verify passport-request   # publish after review
+```
+
+After publishing new procedures, generate their embeddings so the chatbot can use them:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/admin/procedures/embed-all  # needs admin cookie
 ```
 
 **Workflow:** scrape → normalize to JSON → human review → import → verify → live.
@@ -252,10 +303,13 @@ Every chat answer must cite `sourceUrl` and `lastVerifiedAt`.
 
 - [x] Phase 1 — Spring Boot API, PostgreSQL, Flyway, Procedure CRUD
 - [x] Phase 2a — Scraper pipeline, bulk import, draft workflow
+- [x] Phase 3 — Embeddings + pgvector semantic search
+- [x] Phase 4 — RAG chat endpoint (Gemini) with hybrid retrieval + fallback
+- [x] Phase 5 — Angular frontend from `design--/` mockups
+- [x] Phase 6 — Auth (JWT cookies), chat history, office locator + maps
 - [ ] Phase 2b — Real parsers (`services.tn`, `interieur.gov.tn`, `apii.tn`)
-- [ ] Phase 3 — Embeddings + pgvector semantic search
-- [ ] Phase 4 — RAG chat endpoint (Gemini)
-- [ ] Phase 5 — Angular frontend from `design--/` mockups
+- [ ] Real i18n (fr/ar/tn toggle + full RTL), Arabic voice locale
+- [ ] Admin UI for verifying drafts (currently via scraper CLI)
 
 ---
 

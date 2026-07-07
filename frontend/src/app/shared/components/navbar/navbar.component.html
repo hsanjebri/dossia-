@@ -1,0 +1,35 @@
+<header class="navbar">
+  <div class="navbar__inner">
+    <a routerLink="/" class="navbar__brand" (click)="closeMobile()">
+      Dosya <span class="arabic">دوسيا</span>
+    </a>
+
+    <button type="button" class="navbar__toggle" (click)="toggleMobile()" aria-label="Menu">
+      <span class="material-symbols-outlined">{{ mobileOpen ? 'close' : 'menu' }}</span>
+    </button>
+
+    <nav class="navbar__links" [class.navbar__links--open]="mobileOpen">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobile()">
+        Accueil
+      </a>
+      <a routerLink="/" fragment="how-it-works" (click)="closeMobile()">Comment ça marche</a>
+      <a routerLink="/procedures" routerLinkActive="active" (click)="closeMobile()">Procédures</a>
+      <a routerLink="/chat" routerLinkActive="active" (click)="closeMobile()">Assistant</a>
+      <a routerLink="/about" routerLinkActive="active" (click)="closeMobile()">À propos</a>
+      <a routerLink="/faq" routerLinkActive="active" (click)="closeMobile()">FAQ</a>
+
+      @if (auth.isLoggedIn()) {
+        <a routerLink="/profile" routerLinkActive="active" (click)="closeMobile()">Profil</a>
+      }
+    </nav>
+
+    <div class="navbar__actions">
+      @if (auth.isLoggedIn()) {
+        <a routerLink="/chat" class="navbar__cta">Poser une question</a>
+      } @else {
+        <a routerLink="/auth/login" class="navbar__ghost">Connexion</a>
+        <a routerLink="/auth/register" class="navbar__cta">Essayer gratuitement</a>
+      }
+    </div>
+  </div>
+</header>

@@ -10,7 +10,7 @@
   "difficulty": "MODERATE",
   "deliveryMode": "À vérifier",
   "processingTime": "48 heures",
-  "fees": "L’attestation de non-imposition est généralement délivrée très rapidement, souvent le jour même du dépôt de la demande , surtout si le dossier est complet. Dans certains centres fiscaux, le délai peut aller jusqu’à 24 à 48 heures, selon l’affluence ou la vérification préalable du statut du demandeur. En ce qui concerne sa validité, l’attestation n’a pas de durée de validité officielle : elle est considérée comme un document ponctuel, valable pour l’année fiscale mentionnée ou en cours. Si vous avez besoin d’un justificatif pour une autre année (par exemple pour un dossier bancaire ou une demande administrative postérieure), il est préférable d’en demander une nouvelle afin que la situation soit actualisée.",
+  "fees": "1 dinar",
   "sourceUrl": "https://www.demarches.tn/attestation-non-imposition-pour-tunisiens-residant-etranger/",
   "sourceReference": "demarches.tn (COMMUNITY — verify against official source before publish)",
   "status": "DRAFT",
@@ -33,8 +33,8 @@
     },
     {
       "stepNumber": 4,
-      "titleFr": "Exemple réel : Ahlem, Tunisienne vivant au Qatar Ahlem travaille depuis plusieurs années au Qatar. Lorsqu’elle a voulu créer une petite entreprise en Tunisie, l’administration lui a demandé une attestation de non-imposition pour prouver qu’elle n’avait aucun revenu local. Ahlem a présenté sa carte d’identité tunisienne, une attestation de résidence fiscale du Qatar et des relevés bancaires justifiant que ses revenus étaient étrangers. Grâce à la convention de non-double imposition entre la Tunisie et le Qatar, elle a obtenu facilement le document et pu lancer son activité en toute conformité.",
-      "titleAr": "Exemple réel : Ahlem, Tunisienne vivant au Qatar Ahlem travaille depuis plusieurs années au Qatar. Lorsqu’elle a voulu créer une petite entreprise en Tunisie, l’administration lui a demandé une attestation de non-imposition pour prouver qu’elle n’avait aucun revenu local. Ahlem a présenté sa carte d’identité tunisienne, une attestation de résidence fiscale du Qatar et des relevés bancaires justifiant que ses revenus étaient étrangers. Grâce à la convention de non-double imposition entre la Tunisie et le Qatar, elle a obtenu facilement le document et pu lancer son activité en toute conformité."
+      "titleFr": "Exemple réel : Ahlem, Tunisienne vivant au Qatar Ahlem travaille depuis plusieurs années au Qatar. Lorsqu’elle a voulu créer une petite entreprise en Tunisie, l’administration lui a demandé une attestation de non-imposition pour prouver qu’elle n’avait aucun revenu local. Ahlem a présenté sa carte d’identité tunisienne, une attestation de résidence fiscale du Qatar et des relevés bancaires justifiant que ses revenus étaient étrangers. Grâce à la convention de non-double imposition entre la Tuni…",
+      "titleAr": "Exemple réel : Ahlem, Tunisienne vivant au Qatar Ahlem travaille depuis plusieurs années au Qatar. Lorsqu’elle a voulu créer une petite entreprise en Tunisie, l’administration lui a demandé une attestation de non-imposition pour prouver qu’elle n’avait aucun revenu local. Ahlem a présenté sa carte d’identité tunisienne, une attestation de résidence fiscale du Qatar et des relevés bancaires justifiant que ses revenus étaient étrangers. Grâce à la convention de non-double imposition entre la Tuni…"
     }
   ],
   "offices": [],

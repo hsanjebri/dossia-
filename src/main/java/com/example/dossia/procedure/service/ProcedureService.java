@@ -1,5 +1,6 @@
 package com.example.dossia.procedure.service;
 
+import com.example.dossia.chat.ProcedureEmbeddingService;
 import com.example.dossia.common.ConflictException;
 import com.example.dossia.common.Language;
 import com.example.dossia.common.ResourceNotFoundException;
@@ -43,14 +44,17 @@ public class ProcedureService {
     private final ProcedureRepository procedureRepository;
     private final ProcedureMapper procedureMapper;
     private final ProcedureImportService procedureImportService;
+    private final ProcedureEmbeddingService procedureEmbeddingService;
 
     public ProcedureService(
             ProcedureRepository procedureRepository,
             ProcedureMapper procedureMapper,
-            ProcedureImportService procedureImportService) {
+            ProcedureImportService procedureImportService,
+            ProcedureEmbeddingService procedureEmbeddingService) {
         this.procedureRepository = procedureRepository;
         this.procedureMapper = procedureMapper;
         this.procedureImportService = procedureImportService;
+        this.procedureEmbeddingService = procedureEmbeddingService;
     }
 
     public PagedResponse<ProcedureSummaryDto> listPublished(
@@ -199,7 +203,9 @@ public class ProcedureService {
         if (procedure.getStatus() == ProcedureStatus.DRAFT) {
             procedure.setStatus(ProcedureStatus.PUBLISHED);
         }
-        return procedureMapper.toDetail(procedureRepository.save(procedure), lang);
+        Procedure saved = procedureRepository.save(procedure);
+        procedureEmbeddingService.embedProcedure(saved.getId());
+        return procedureMapper.toDetail(saved, lang);
     }
 
     private void applyFields(Procedure procedure, CreateProcedureRequest request) {

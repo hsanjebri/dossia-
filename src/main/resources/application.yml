@@ -2,7 +2,7 @@ spring:
   application:
     name: dossia
   config:
-    import: optional:classpath:application-local.yml
+    import: optional:classpath:application-local.yml,optional:file:.env[.properties]
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dossia}
     username: ${POSTGRES_USER:postgres}
@@ -25,3 +25,16 @@ server:
 dossia:
   cors:
     allowed-origins: http://localhost:4200
+  auth:
+    jwt-secret: ${JWT_SECRET:dosya-local-dev-secret-change-in-production-min-32-chars}
+    jwt-expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+    cookie-name: dossia_access_token
+    cookie-secure: ${AUTH_COOKIE_SECURE:false}
+    cookie-same-site: Lax
+    admin-emails: ${ADMIN_EMAILS:}
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    chat-model: ${GEMINI_CHAT_MODEL:gemini-2.5-flash}
+    embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
+    retrieval-limit: ${GEMINI_RETRIEVAL_LIMIT:5}
+    enabled: ${GEMINI_ENABLED:true}

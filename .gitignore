@@ -41,3 +41,4 @@ scraper/data/raw/*.html
 
 ### Local secrets ###
 src/main/resources/application-local.yml
+.env
