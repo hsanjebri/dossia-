@@ -59,7 +59,12 @@
         </a>
       } @else {
         <p class="muted chat-sidebar__hint">Connectez-vous pour synchroniser l'historique sur tous vos appareils.</p>
-        <a routerLink="/auth/login" class="btn btn--secondary btn--block">Se connecter</a>
+        <a
+          routerLink="/auth/login"
+          [queryParams]="{ returnUrl: '/chat' }"
+          class="btn btn--secondary btn--block"
+          (click)="prepareAuthLeave()"
+        >Se connecter</a>
       }
     </div>
   </aside>
@@ -124,7 +129,11 @@
             <div class="message__avatar">D</div>
           }
           <div class="message__bubble">
-            <p class="message__text">{{ msg.content }}</p>
+            @if (msg.role === 'assistant') {
+              <div class="message__text message__text--md" [innerHTML]="msg.content | markdown"></div>
+            } @else {
+              <p class="message__text">{{ msg.content }}</p>
+            }
             @if (msg.role === 'assistant' && voice.speechSupported) {
               <button type="button" class="message__speak" (click)="speakMessage(msg.content)" title="Écouter">
                 <span class="material-symbols-outlined">volume_up</span>
@@ -133,16 +142,35 @@
             @if (msg.sources?.length) {
               <div class="sources">
                 <p class="sources__title">
-                  <span class="material-symbols-outlined">source</span>
-                  Sources utilisées
+                  <span class="material-symbols-outlined">folder_open</span>
+                  Procédures Dosya
                 </p>
                 @for (src of msg.sources; track src.id) {
                   <a [routerLink]="['/procedures', src.slug]" class="source-card">
-                    <strong>{{ src.title }}</strong>
-                    @if (src.lastVerifiedAt) {
-                      <span>Vérifié {{ src.lastVerifiedAt | date: 'shortDate' }}</span>
-                    }
+                    <div class="source-card__top">
+                      <strong>{{ src.title }}</strong>
+                      @if (src.ministry) {
+                        <span class="source-card__ministry">{{ src.ministry }}</span>
+                      }
+                    </div>
+                    <div class="source-card__meta">
+                      @if (src.lastVerifiedAt) {
+                        <span>Vérifié {{ src.lastVerifiedAt | date: 'shortDate' }}</span>
+                      }
+                      @if (src.category) {
+                        <span>{{ src.category }}</span>
+                      }
+                    </div>
                   </a>
+                }
+              </div>
+            }
+            @if (msg.suggestions?.length && !msg.streaming && $index === messages.length - 1) {
+              <div class="action-chips">
+                @for (chip of msg.suggestions; track chip.id) {
+                  <button type="button" class="action-chip" (click)="useChip(chip.prompt)">
+                    {{ chip.label }}
+                  </button>
                 }
               </div>
             }
@@ -161,21 +189,12 @@
       }
 
       @if (loading) {
-        <div class="message message--thinking">
-          <div class="message__avatar message__avatar--pulse">D</div>
-          <div class="message__bubble message__bubble--thinking" [class.message__bubble--done]="thinkingDone">
-            <div class="thinking-header">
-              <span class="material-symbols-outlined thinking-icon" [class.spin]="!thinkingDone">psychology</span>
-              <strong>{{ thinkingLabel() }}</strong>
-            </div>
-            <div class="thinking-steps">
-              @for (label of thinkingLabels; track label; let i = $index) {
-                <div class="thinking-step" [class.thinking-step--done]="thinkingDone || i < thinkingStep" [class.thinking-step--current]="!thinkingDone && i === thinkingStep">
-                  <span class="thinking-step__dot"></span>
-                  <span>{{ label }}</span>
-                </div>
-              }
-            </div>
+        <div class="message message--typing" aria-live="polite" aria-label="Dosya is typing">
+          <div class="message__avatar">D</div>
+          <div class="message__bubble message__bubble--typing">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
           </div>
         </div>
       }
@@ -190,6 +209,12 @@
     }
 
     <form class="composer card" (submit)="$event.preventDefault(); send()">
+      @if (!auth.isLoggedIn()) {
+        <div class="composer__quota" [class.composer__quota--low]="guestRemaining <= 2">
+          <span class="material-symbols-outlined">chat_bubble</span>
+          {{ guestRemaining }} message{{ guestRemaining === 1 ? '' : 's' }} gratuit{{ guestRemaining === 1 ? '' : 's' }} restant{{ guestRemaining === 1 ? '' : 's' }}
+        </div>
+      }
       @if (voice.speechSupported) {
         <button
           type="button"
@@ -197,7 +222,7 @@
           [class.composer__mic--active]="voice.isListening()"
           (click)="onVoiceInput()"
           title="Parler"
-          [disabled]="loading"
+          [disabled]="loading || isComposerLocked"
         >
           <span class="material-symbols-outlined">{{ voice.isListening() ? 'mic' : 'mic_none' }}</span>
         </button>
@@ -206,13 +231,54 @@
         type="text"
         [(ngModel)]="input"
         name="message"
-        placeholder="Posez votre question en français ou en arabe…"
-        [disabled]="loading"
+        [placeholder]="isComposerLocked ? 'Créez un compte pour continuer…' : 'Posez votre question en français ou en arabe…'"
+        [disabled]="loading || isComposerLocked"
         autocomplete="off"
       />
-      <button type="submit" class="btn btn--primary composer__send" [disabled]="loading || !input.trim()">
+      <button
+        type="submit"
+        class="btn btn--primary composer__send"
+        [disabled]="loading || isComposerLocked || !input.trim()"
+      >
         <span class="material-symbols-outlined">send</span>
       </button>
     </form>
   </section>
+
+  @if (showAuthGate) {
+    <div class="auth-gate" role="dialog" aria-modal="true" aria-labelledby="auth-gate-title">
+      <button type="button" class="auth-gate__backdrop" (click)="closeAuthGate()" aria-label="Fermer"></button>
+      <div class="auth-gate__panel">
+        <button type="button" class="auth-gate__close" (click)="closeAuthGate()" aria-label="Fermer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="auth-gate__glow" aria-hidden="true"></div>
+        <div class="auth-gate__icon">
+          <span class="material-symbols-outlined">auto_awesome</span>
+        </div>
+        <h2 id="auth-gate-title">Continuez avec Dosya</h2>
+        <p>
+          Vous avez utilisé vos {{ guestPromptLimit }} messages gratuits.
+          Créez un compte gratuit pour des conversations illimitées, l'historique synchronisé et un suivi plus intelligent.
+        </p>
+        <div class="auth-gate__actions">
+          <a
+            routerLink="/auth/register"
+            [queryParams]="{ returnUrl: '/chat' }"
+            class="btn btn--primary btn--block"
+            (click)="prepareAuthLeave()"
+          >Créer un compte</a>
+          <a
+            routerLink="/auth/login"
+            [queryParams]="{ returnUrl: '/chat' }"
+            class="btn btn--secondary btn--block"
+            (click)="prepareAuthLeave()"
+          >Se connecter</a>
+        </div>
+        <button type="button" class="auth-gate__dismiss" (click)="closeAuthGate()">
+          Pas maintenant
+        </button>
+      </div>
+    </div>
+  }
 </div>

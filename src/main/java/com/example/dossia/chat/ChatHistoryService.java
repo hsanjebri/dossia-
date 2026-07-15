@@ -6,6 +6,7 @@ import com.example.dossia.chat.domain.MessageRole;
 import com.example.dossia.chat.dto.ChatSessionDetailDto;
 import com.example.dossia.chat.dto.ChatSessionSummaryDto;
 import com.example.dossia.chat.dto.ChatSourceDto;
+import com.example.dossia.chat.dto.ImportChatSessionRequest;
 import com.example.dossia.chat.dto.StoredChatMessageDto;
 import com.example.dossia.chat.repository.ChatSessionRepository;
 import com.example.dossia.common.ResourceNotFoundException;
@@ -92,6 +93,82 @@ public class ChatHistoryService {
     public void appendAssistantMessage(ChatSession session, String content, List<ChatSourceDto> sources) {
         session.getMessages().add(buildMessage(session, MessageRole.ASSISTANT, content, sources));
         sessionRepository.save(session);
+    }
+
+    /** Improve auto-title after the first real user question (skip ultra-short greetings). */
+    @Transactional
+    public void maybeRefreshTitle(ChatSession session, String latestUserMessage) {
+        if (session == null || latestUserMessage == null || latestUserMessage.isBlank()) {
+            return;
+        }
+        String cleaned = latestUserMessage.strip().replaceAll("\\s+", " ");
+        if (cleaned.length() < 12) {
+            return;
+        }
+        String current = session.getTitle() == null ? "" : session.getTitle();
+        boolean lookGeneric = current.isBlank()
+                || current.equals("Nouvelle conversation")
+                || current.equals("Conversation d'essai")
+                || current.length() < 8
+                || current.toLowerCase().matches("^(hi+|hello+|hey+|bonjour|salut|ahlan).*");
+        if (lookGeneric || session.getMessages().size() <= 4) {
+            session.setTitle(buildTitle(cleaned));
+            sessionRepository.save(session);
+        }
+    }
+
+    /**
+     * Import guest trial conversations into the user's account (after register/login).
+     * Returns summaries of newly created sessions (newest first).
+     */
+    @Transactional
+    public List<ChatSessionSummaryDto> importGuestSessions(UUID userId, List<ImportChatSessionRequest> sessions) {
+        if (userId == null || sessions == null || sessions.isEmpty()) {
+            return List.of();
+        }
+        List<ChatSession> created = new java.util.ArrayList<>();
+        int imported = 0;
+        for (ImportChatSessionRequest incoming : sessions) {
+            if (incoming == null || incoming.messages() == null || incoming.messages().isEmpty()) {
+                continue;
+            }
+            if (imported >= 20) {
+                break;
+            }
+            ChatSession session = new ChatSession();
+            session.setUserId(userId);
+            String title = incoming.title();
+            if (title == null || title.isBlank()) {
+                title = incoming.messages().stream()
+                        .filter(m -> m.role() != null && m.role().equalsIgnoreCase("user"))
+                        .map(ImportChatSessionRequest.ImportChatMessageDto::content)
+                        .findFirst()
+                        .orElse("Conversation d'essai");
+            }
+            session.setTitle(buildTitle(title));
+
+            int msgCount = 0;
+            for (ImportChatSessionRequest.ImportChatMessageDto msg : incoming.messages()) {
+                if (msg == null || msg.content() == null || msg.content().isBlank() || msg.role() == null) {
+                    continue;
+                }
+                if (msgCount >= 100) {
+                    break;
+                }
+                MessageRole role = msg.role().equalsIgnoreCase("user") ? MessageRole.USER : MessageRole.ASSISTANT;
+                List<ChatSourceDto> sources =
+                        role == MessageRole.ASSISTANT && msg.sources() != null ? msg.sources() : null;
+                session.getMessages().add(buildMessage(session, role, msg.content().strip(), sources));
+                msgCount++;
+            }
+            if (session.getMessages().isEmpty()) {
+                continue;
+            }
+            created.add(sessionRepository.save(session));
+            imported++;
+        }
+        // Keep input order (guest "current" conversation is first).
+        return created.stream().map(this::toSummary).toList();
     }
 
     private ChatSession requireSession(UUID userId, UUID sessionId) {

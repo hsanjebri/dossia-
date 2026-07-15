@@ -9,13 +9,23 @@ public record ChatResponse(
         List<ChatSourceDto> sources,
         String model,
         UUID sessionId,
-        List<NearbyOfficeDto> nearbyOffices) {
+        List<NearbyOfficeDto> nearbyOffices,
+        List<ChatSuggestionDto> suggestions) {
 
     public ChatResponse(String answer, List<ChatSourceDto> sources, String model) {
-        this(answer, sources, model, null, List.of());
+        this(answer, sources, model, null, List.of(), List.of());
     }
 
     public ChatResponse(String answer, List<ChatSourceDto> sources, String model, UUID sessionId) {
-        this(answer, sources, model, sessionId, List.of());
+        this(answer, sources, model, sessionId, List.of(), List.of());
+    }
+
+    public ChatResponse(
+            String answer,
+            List<ChatSourceDto> sources,
+            String model,
+            UUID sessionId,
+            List<NearbyOfficeDto> nearbyOffices) {
+        this(answer, sources, model, sessionId, nearbyOffices, List.of());
     }
 }

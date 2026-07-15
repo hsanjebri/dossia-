@@ -38,7 +38,7 @@ export class VoiceService {
     }
   }
 
-  startListening(onTranscript: (text: string) => void): void {
+  startListening(onTranscript: (text: string) => void, lang = 'fr-FR'): void {
     if (!this.speechSupported) return;
 
     this.onTranscript = onTranscript;
@@ -52,7 +52,6 @@ export class VoiceService {
 
     if (!this.recognition) {
       this.recognition = new SpeechRecognitionCtor();
-      this.recognition.lang = 'fr-FR';
       this.recognition.continuous = false;
       this.recognition.interimResults = true;
 
@@ -67,6 +66,7 @@ export class VoiceService {
       this.recognition.onend = () => this.isListening.set(false);
     }
 
+    this.recognition.lang = lang;
     this.isListening.set(true);
     this.recognition.start();
   }
@@ -88,7 +88,17 @@ export class VoiceService {
     if (!('speechSynthesis' in window) || !text.trim()) return;
 
     this.stopSpeaking();
-    const utterance = new SpeechSynthesisUtterance(text);
+    const clean = text
+      .replace(/```[\s\S]*?```/g, ' ')
+      .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/[#>*_`~]/g, ' ')
+      .replace(/\*\*/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!clean) return;
+
+    const utterance = new SpeechSynthesisUtterance(clean);
     utterance.lang = lang;
     utterance.rate = 1;
     utterance.onstart = () => this.isSpeaking.set(true);

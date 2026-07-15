@@ -1,5 +1,11 @@
 import { NearbyOffice } from './office.model';
 
+export interface ChatSuggestion {
+  id: string;
+  label: string;
+  prompt: string;
+}
+
 export interface ChatSource {
   id: string;
   slug: string;
@@ -7,6 +13,8 @@ export interface ChatSource {
   sourceUrl: string | null;
   lastVerifiedAt: string | null;
   similarityScore: number;
+  ministry?: string | null;
+  category?: string | null;
 }
 
 export interface ChatResponse {
@@ -15,6 +23,7 @@ export interface ChatResponse {
   model: string;
   sessionId: string | null;
   nearbyOffices: NearbyOffice[];
+  suggestions?: ChatSuggestion[];
 }
 
 export interface ChatMessage {
@@ -22,6 +31,8 @@ export interface ChatMessage {
   content: string;
   sources?: ChatSource[];
   nearbyOffices?: NearbyOffice[];
+  suggestions?: ChatSuggestion[];
+  streaming?: boolean;
 }
 
 export interface ChatSessionSummary {

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, switchMap, tap, catchError, map } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import {
   ChatMessage,
@@ -10,6 +10,8 @@ import {
 import { ChatApiService } from './chat-api.service';
 
 const STORAGE_KEY = 'dosya.chat.sessions';
+const GUEST_PROMPT_KEY = 'dosya_guest_prompt_count';
+const PENDING_SESSION_KEY = 'dosya.chat.pendingSessionId';
 
 @Injectable({ providedIn: 'root' })
 export class ChatHistoryService {
@@ -30,7 +32,7 @@ export class ChatHistoryService {
           next: (detail) => {
             subscriber.next(
               detail.messages.map((m) => ({
-                role: m.role,
+                role: m.role as 'user' | 'assistant',
                 content: m.content,
                 sources: m.sources?.length ? m.sources : undefined,
               })),
@@ -83,6 +85,110 @@ export class ChatHistoryService {
     sessions = [session, ...sessions.filter((s) => s.id !== session.id)].slice(0, 30);
     this.writeLocal(sessions);
     return session.id;
+  }
+
+  /** Save the in-memory guest thread before leaving for register/login. */
+  saveGuestConversation(messages: ChatMessage[], sessionId: string | null): string | null {
+    const exchanges = messages.filter(
+      (m) =>
+        (m.role === 'user' || m.role === 'assistant') &&
+        m.content?.trim() &&
+        !m.content.startsWith('Ahlan ! Je suis Dosya'),
+    );
+    if (exchanges.length === 0) {
+      return sessionId;
+    }
+
+    const now = new Date().toISOString();
+    let sessions = this.readLocal();
+    const firstUser = exchanges.find((m) => m.role === 'user')?.content ?? 'Conversation d\'essai';
+    let session = sessionId ? sessions.find((s) => s.id === sessionId) : undefined;
+    if (!session) {
+      session = this.newLocalSession(firstUser, now);
+    }
+    session.messages = exchanges.map((m) => ({
+      role: m.role,
+      content: m.content,
+      sources: m.sources,
+    }));
+    session.preview = exchanges.at(-1)?.content.slice(0, 120) ?? '';
+    session.updatedAt = now;
+    session.title = this.buildTitle(firstUser);
+
+    sessions = [session, ...sessions.filter((s) => s.id !== session!.id)].slice(0, 30);
+    this.writeLocal(sessions);
+    this.setPendingSessionId(session.id);
+    return session.id;
+  }
+
+  /**
+   * After register/login: upload guest trial chats to the account, clear local trial data.
+   * Returns the preferred session id to reopen (pending or newest imported).
+   */
+  migrateGuestChatsToAccount(): Observable<string | null> {
+    if (!this.auth.isLoggedIn()) {
+      return of(null);
+    }
+
+    const local = this.readLocal().filter((s) => s.messages?.length);
+    if (!local.length) {
+      this.clearGuestPromptCount();
+      return of(this.consumePendingSessionId());
+    }
+
+    const payload = local.map((s) => ({
+      title: s.title || 'Conversation d\'essai',
+      messages: s.messages
+        .filter((m) => m.role === 'user' || m.role === 'assistant')
+        .map((m) => ({
+          role: m.role,
+          content: m.content,
+          sources: m.sources ?? null,
+        })),
+    }));
+
+    const pendingLocalId = this.consumePendingSessionId();
+
+    return this.api.importGuestSessions(payload).pipe(
+      tap(() => {
+        this.writeLocal([]);
+        this.clearGuestPromptCount();
+      }),
+      map((imported) => imported[0]?.id ?? null),
+      catchError(() => {
+        // Keep local data if import fails; still clear prompt gate for logged-in users.
+        this.clearGuestPromptCount();
+        return of(pendingLocalId);
+      }),
+      switchMap((importedId) => of(importedId)),
+    );
+  }
+
+  setPendingSessionId(id: string | null): void {
+    try {
+      if (id) localStorage.setItem(PENDING_SESSION_KEY, id);
+      else localStorage.removeItem(PENDING_SESSION_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  consumePendingSessionId(): string | null {
+    try {
+      const id = localStorage.getItem(PENDING_SESSION_KEY);
+      localStorage.removeItem(PENDING_SESSION_KEY);
+      return id;
+    } catch {
+      return null;
+    }
+  }
+
+  private clearGuestPromptCount(): void {
+    try {
+      localStorage.removeItem(GUEST_PROMPT_KEY);
+    } catch {
+      /* ignore */
+    }
   }
 
   private newLocalSession(firstMessage: string, updatedAt: string): LocalChatSession {

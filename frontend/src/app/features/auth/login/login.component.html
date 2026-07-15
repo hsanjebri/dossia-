@@ -35,7 +35,7 @@
 
       <p class="auth-card__footer muted">
         Pas encore de compte ?
-        <a routerLink="/auth/register">Créer un compte gratuit</a>
+        <a routerLink="/auth/register" [queryParams]="{ returnUrl: returnUrl }">Créer un compte gratuit</a>
       </p>
       <a routerLink="/" class="auth-card__back">← Retour à l'accueil</a>
     </div>

@@ -1,5 +1,6 @@
 package com.example.dossia.chat;
 
+import com.example.dossia.common.GeminiException;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -25,15 +26,19 @@ public class ChatQueryExpander {
         }
 
         String trimmed = message.strip();
-        String expanded = geminiClient.generate(SYSTEM_PROMPT, trimmed, 0.1);
-        if (expanded.isBlank()) {
-            return Optional.empty();
-        }
+        try {
+            String expanded = geminiClient.generate(SYSTEM_PROMPT, trimmed, 0.1);
+            if (expanded.isBlank()) {
+                return Optional.empty();
+            }
 
-        String normalized = expanded.strip();
-        if (normalized.equalsIgnoreCase(trimmed)) {
+            String normalized = expanded.strip();
+            if (normalized.equalsIgnoreCase(trimmed)) {
+                return Optional.empty();
+            }
+            return Optional.of(normalized);
+        } catch (GeminiException ignored) {
             return Optional.empty();
         }
-        return Optional.of(normalized);
     }
 }

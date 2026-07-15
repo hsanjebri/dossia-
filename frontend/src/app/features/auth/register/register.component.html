@@ -13,7 +13,7 @@
   <div class="auth-page__form-panel">
     <div class="auth-card card">
       <h2>Créer un compte</h2>
-      <p class="muted">Essai gratuit — aucune carte requise.</p>
+      <p class="muted">Votre essai gratuit et vos conversations sont sauvegardés sur votre compte.</p>
 
       @if (error) {
         <div class="error-box">{{ error }}</div>
@@ -39,7 +39,7 @@
 
       <p class="auth-card__footer muted">
         Déjà un compte ?
-        <a routerLink="/auth/login">Se connecter</a>
+        <a routerLink="/auth/login" [queryParams]="{ returnUrl: returnUrl }">Se connecter</a>
       </p>
       <a routerLink="/" class="auth-card__back">← Retour à l'accueil</a>
     </div>

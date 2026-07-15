@@ -171,6 +171,19 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 ### 3. Run the API
 
+From the repo root (loads `.env` so Gemini works):
+
+```bash
+# Windows PowerShell
+.\scripts\run-backend.ps1
+
+# macOS / Linux
+chmod +x scripts/run-backend.sh
+./scripts/run-backend.sh
+```
+
+Or manually (ensure `GEMINI_API_KEY` is in the environment):
+
 ```bash
 ./mvnw spring-boot:run
 ```

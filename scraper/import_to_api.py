@@ -25,7 +25,28 @@ import requests
 from normalize import truncate_field
 
 ROOT = Path(__file__).resolve().parent
+REPO_ROOT = ROOT.parent
 DRAFT_DIR = ROOT / "data" / "draft"
+DEFAULT_API_URL = os.environ.get("DOSSIA_API_URL", "http://localhost:8080")
+
+
+def load_env_files() -> None:
+    """Load KEY=VALUE pairs from repo .env files into os.environ (does not override existing)."""
+    for path in (REPO_ROOT / ".env", ROOT / ".env"):
+        if not path.is_file():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+
+load_env_files()
 DEFAULT_API_URL = os.environ.get("DOSSIA_API_URL", "http://localhost:8080")
 
 
@@ -115,15 +136,60 @@ def verify_by_slug(session: requests.Session, api_url: str, slug: str) -> None:
     print(f"Verified and published: {slug} ({procedure_id})")
 
 
+def embed_all(session: requests.Session, api_url: str) -> dict:
+    response = session.post(
+        f"{api_url}/api/v1/admin/procedures/embed-all",
+        timeout=300,
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+# High-value Tunisia procedures — skip Morocco/calendar noise
+DEMO_PUBLISH_SLUGS = [
+    "le-parcours-pour-obtenir-un-livret-de-famille",
+    "comment-renouveler-son-passeport-tunisien-lorsquon-est-a-letranger",
+    "documents-didentite-comment-les-obtenir-et-les-renouveler",
+    "tout-savoir-sur-lacquisition-de-votre-certificat-de-nationalite",
+    "tout-savoir-sur-lobtention-de-lextrait-de-mariage-en-tunisie",
+    "toute-la-procedure-pour-acquerir-la-nationalite-tunisienne",
+    "attestation-de-concordance-didentite-pour-des-papiers-sans-erreurs",
+    "formalites-dinstallation-des-residents-etrangers-en-tunisie",
+    "simplifiez-vous-la-vie-avec-la-carte-dinvalidite",
+    "comment-obtenir-une-attestation-de-non-imposition-pour-les-tunisiens-residant-a-letranger",
+    "valider-son-mariage-celebre-a-letranger-tout-ce-que-vous-devez-savoir",
+    "le-conge-maladie-comprendre-vos-droits-pour-mieux-vous-soigner",
+]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Import Dosya procedure drafts")
     parser.add_argument("--api-url", default=DEFAULT_API_URL)
     parser.add_argument("--file", type=Path, help="Import a single JSON file")
     parser.add_argument("--verify", metavar="SLUG", help="Verify/publish a draft by slug")
+    parser.add_argument("--publish-demo", action="store_true", help="Verify all high-value demo drafts")
+    parser.add_argument("--embed-all", action="store_true", help="Generate embeddings for published procedures")
     parser.add_argument("--list-drafts", action="store_true", help="List draft procedures")
     args = parser.parse_args()
 
     session = build_session(args.api_url)
+
+    if args.embed_all:
+        result = embed_all(session, args.api_url)
+        print(f"Embed complete: embedded={result['embedded']} skipped={result['skipped']} errors={result['errors']}")
+        return
+
+    if args.publish_demo:
+        ok, skip = 0, 0
+        for slug in DEMO_PUBLISH_SLUGS:
+            try:
+                verify_by_slug(session, args.api_url, slug)
+                ok += 1
+            except SystemExit as exc:
+                print(f"Skipped {slug}: {exc}", file=sys.stderr)
+                skip += 1
+        print(f"Publish demo complete: published={ok} skipped={skip}")
+        return
 
     if args.list_drafts:
         result = list_drafts(session, args.api_url)

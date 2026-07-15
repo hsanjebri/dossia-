@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ChatHistoryService } from '../../../core/services/chat-history.service';
 
 @Component({
   selector: 'app-register',
@@ -11,15 +12,22 @@ import { AuthService } from '../../../core/auth/auth.service';
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly history = inject(ChatHistoryService);
 
   name = '';
   email = '';
   password = '';
   error = '';
   loading = false;
+  returnUrl = '/chat';
+
+  ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/chat';
+  }
 
   submit(): void {
     this.error = '';
@@ -31,8 +39,18 @@ export class RegisterComponent {
     this.loading = true;
     this.auth.register(this.name, this.email, this.password).subscribe({
       next: () => {
-        this.loading = false;
-        void this.router.navigate(['/procedures']);
+        this.history.migrateGuestChatsToAccount().subscribe({
+          next: (sessionId) => {
+            this.loading = false;
+            void this.router.navigate([this.returnUrl], {
+              queryParams: sessionId ? { session: sessionId } : undefined,
+            });
+          },
+          error: () => {
+            this.loading = false;
+            void this.router.navigate([this.returnUrl]);
+          },
+        });
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;

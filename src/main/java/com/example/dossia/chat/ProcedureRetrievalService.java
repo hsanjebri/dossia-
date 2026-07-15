@@ -42,17 +42,19 @@ public class ProcedureRetrievalService {
     }
 
     public List<RetrievedProcedure> retrieve(String query, Language lang) {
-        if (!geminiProperties.isConfigured()) {
-            throw new GeminiException("Gemini is not configured. Set GEMINI_API_KEY in .env");
-        }
-
         Map<UUID, Double> scores = new LinkedHashMap<>();
 
-        float[] queryEmbedding = geminiClient.embed(query);
-        List<UUID> vectorIds = procedureRepository.findSimilarPublishedIds(
-                VectorUtils.toPgVector(queryEmbedding), geminiProperties.retrievalLimit());
-        for (int i = 0; i < vectorIds.size(); i++) {
-            scores.merge(vectorIds.get(i), (double) vectorIds.size() - i, Math::max);
+        if (geminiProperties.isConfigured()) {
+            try {
+                float[] queryEmbedding = geminiClient.embed(query);
+                List<UUID> vectorIds = procedureRepository.findSimilarPublishedIds(
+                        VectorUtils.toPgVector(queryEmbedding), geminiProperties.retrievalLimit());
+                for (int i = 0; i < vectorIds.size(); i++) {
+                    scores.merge(vectorIds.get(i), (double) vectorIds.size() - i, Math::max);
+                }
+            } catch (GeminiException ignored) {
+                // Vector search unavailable — keyword + intent matching still works.
+            }
         }
 
         for (String term : queryMatcher.extractSearchTerms(query)) {
