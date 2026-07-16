@@ -16,6 +16,7 @@ export class ChatApiService {
     lng?: number | null,
     lang = 'fr',
     history?: { role: string; content: string }[],
+    agentId?: string | null,
   ): Observable<ChatResponse> {
     return this.http.post<ChatResponse>(
       `${this.base}/chat`,
@@ -25,9 +26,24 @@ export class ChatApiService {
         latitude: lat ?? null,
         longitude: lng ?? null,
         history: history?.length ? history : null,
+        agentId: agentId ?? null,
       },
       { params: { lang } },
     );
+  }
+
+  reportFeedback(payload: {
+    sessionId?: string | null;
+    userMessage?: string;
+    assistantAnswer?: string;
+    reason: string;
+  }): Observable<{ id: string }> {
+    return this.http.post<{ id: string }>(`${this.base}/chat/feedback`, {
+      sessionId: payload.sessionId ?? null,
+      userMessage: payload.userMessage ?? null,
+      assistantAnswer: payload.assistantAnswer ?? null,
+      reason: payload.reason,
+    });
   }
 
   listSessions(): Observable<ChatSessionSummary[]> {

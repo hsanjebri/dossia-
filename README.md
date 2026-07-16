@@ -2,7 +2,9 @@
 
 **Stop guessing. Start knowing.**
 
-Dosya is a civic tech platform that helps Tunisian citizens navigate government bureaucracy. Every answer is grounded in **verified procedure data** stored in PostgreSQL — not improvised by AI.
+Dosya is a civic tech platform that helps Tunisian citizens navigate government bureaucracy — passeport, CIN, équivalence de diplôme, résidence, and more. Every answer is grounded in **verified procedure data** stored in PostgreSQL — not improvised by AI.
+
+Talk to it in **French, English, or Tunisian Derja** with voice guides (Sofia · Yasmine · Alex). Ask where to go, what papers you need, and get step-by-step guidance with sources.
 
 > **دوسيا** — "file / dossier" in Tunisian Arabic.
 
@@ -19,7 +21,8 @@ Dosya is a civic tech platform that helps Tunisian citizens navigate government 
 | Procedures scattered across ministries | Single searchable catalog |
 | Word-of-mouth, outdated info | Versioned records with `sourceUrl` + `lastVerifiedAt` |
 | Generic chatbots invent facts | RAG over verified `Procedure` records only |
-| French / Arabic / dialect mix | Bilingual fields as first-class data |
+| French / Arabic / dialect mix | FR · AR · Tunisian Derja (incl. voice agents) |
+| “Where do I go?” | Nearest offices on a map when you ask |
 
 ---
 
@@ -58,7 +61,7 @@ flowchart LR
     subgraph backend [Spring Boot API]
         API[REST API]
         Auth[Auth - JWT cookies]
-        RAG[RAG Chat - Gemini]
+        RAG[RAG Chat - Gemini or Ollama]
         Office[Office Locator]
     end
 
@@ -66,6 +69,10 @@ flowchart LR
         DB[(procedures + embeddings)]
         Users[(users)]
         Chats[(chat history)]
+    end
+
+    subgraph llm [Optional local LLM]
+        Ollama[Ollama - Qwen]
     end
 
     Web --> API
@@ -77,6 +84,7 @@ flowchart LR
     Auth --> Users
     RAG --> DB
     RAG --> Chats
+    RAG --> Ollama
     Office --> DB
 ```
 
@@ -90,10 +98,12 @@ flowchart LR
 | Database | PostgreSQL 17 + pgvector |
 | Migrations | Flyway |
 | Frontend | Angular 19 (standalone components) |
-| AI / RAG | Gemini 2.5 Flash + `gemini-embedding-001` over pgvector |
+| AI / RAG | Gemini **or** Ollama (`qwen2.5:7b-instruct` + `nomic-embed-text`), hybrid retrieval over pgvector |
+| Voice | Browser STT/TTS + agents (Sofia FR · Yasmine TN · Alex EN) |
 | Auth | JWT in HttpOnly cookies, Spring Security |
 | Maps | Leaflet + OSRM routing |
 | Scraper | Python 3, BeautifulSoup, Requests |
+| Infra | Docker Compose (Postgres + Ollama) |
 
 ---
 
@@ -116,7 +126,7 @@ dossia/
 ├── src/main/java/com/example/dossia/
 │   ├── procedure/          # Domain, API, service layer
 │   ├── auth/               # JWT cookie auth, users, security
-│   ├── chat/               # Gemini RAG, retrieval, chat history
+│   ├── chat/               # RAG chat (Gemini/Ollama), retrieval, history, voice agents
 │   ├── office/             # Office locator (nearest service point)
 │   ├── common/             # Exceptions, health check
 │   └── config/             # CORS, auth & gemini properties, beans
@@ -142,7 +152,7 @@ dossia/
 - PostgreSQL 17 with [pgvector](https://github.com/pgvector/pgvector) (or `docker compose up`)
 - Node 20+ and npm (for the Angular frontend)
 - Python 3.11+ (for scraper)
-- A Gemini API key (for chat + embeddings)
+- A Gemini API key **or** Ollama (self-hosted LLM) for chat + embeddings
 
 ### 1. Configure environment
 
@@ -150,18 +160,26 @@ Copy the example env file and fill in your values (this file is read by **both**
 
 ```bash
 cp .env.example .env
-# then edit .env: GEMINI_API_KEY, JWT_SECRET (min 32 chars), ADMIN_EMAILS, DB creds
+# then edit .env: JWT_SECRET, ADMIN_EMAILS, DB creds
+# LLM: GEMINI_API_KEY and/or Ollama (LLM_PROVIDER=auto|gemini|ollama)
 ```
 
-### 2. Start the database
-
-Either use Docker:
+### 2. Start the database (+ optional Ollama)
 
 ```bash
 docker compose up -d
 ```
 
-Or create it manually in `psql` as superuser (the `vector` extension is also created by Flyway migration V2):
+This starts Postgres (pgvector) and **Ollama** on `localhost:11434`. Pull models once (~5GB for Qwen):
+
+```powershell
+.\scripts\pull-ollama-models.ps1
+```
+
+Defaults: chat `qwen2.5:7b-instruct`, embeddings `nomic-embed-text`.  
+Force local LLM with `LLM_PROVIDER=ollama` in `.env`.
+
+Or create the DB manually in `psql` as superuser (the `vector` extension is also created by Flyway migration V2):
 
 ```sql
 CREATE DATABASE dossia;
@@ -171,7 +189,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 ### 3. Run the API
 
-From the repo root (loads `.env` so Gemini works):
+From the repo root (loads `.env`):
 
 ```bash
 # Windows PowerShell
@@ -182,7 +200,7 @@ chmod +x scripts/run-backend.sh
 ./scripts/run-backend.sh
 ```
 
-Or manually (ensure `GEMINI_API_KEY` is in the environment):
+Or manually:
 
 ```bash
 ./mvnw spring-boot:run

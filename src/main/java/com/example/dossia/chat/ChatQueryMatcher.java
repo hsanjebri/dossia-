@@ -44,11 +44,81 @@ public class ChatQueryMatcher {
                     "comment-obtenir-un-passeport-tunisien-facilement",
                     "demande-de-passeport-biometrique",
                     "comment-renouveler-son-passeport-tunisien-lorsquon-est-a-letranger")),
+            // Derja / Arabizi
+            Map.entry("paspor", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "demande-de-passeport-biometrique")),
+            Map.entry("pasport", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "demande-de-passeport-biometrique")),
+            Map.entry("jawaz", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "demande-de-passeport-biometrique")),
+            // Arabic / Derja script (Chrome STT often outputs these)
+            Map.entry("باسبور", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "demande-de-passeport-biometrique",
+                    "comment-renouveler-son-passeport-tunisien-lorsquon-est-a-letranger")),
+            Map.entry("پاسپور", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "demande-de-passeport-biometrique")),
+            Map.entry("باسپور", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "demande-de-passeport-biometrique")),
+            Map.entry("جواز", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "demande-de-passeport-biometrique",
+                    "comment-renouveler-son-passeport-tunisien-lorsquon-est-a-letranger")),
+            Map.entry("تجديد", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "national-id-card-renewal")),
+            Map.entry("نجدد", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "demande-de-passeport-biometrique",
+                    "national-id-card-renewal")),
+            Map.entry("نبدّل", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "national-id-card-renewal")),
+            Map.entry("نبدل", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "national-id-card-renewal")),
+            Map.entry("بطاقة", List.of(
+                    "national-id-card-renewal",
+                    "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("بطاقه", List.of(
+                    "national-id-card-renewal",
+                    "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("تعريف", List.of(
+                    "national-id-card-renewal",
+                    "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("كارط", List.of(
+                    "national-id-card-renewal",
+                    "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("سي ان", List.of(
+                    "national-id-card-renewal",
+                    "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("معادلة", List.of("equivalence-diplome")),
+            Map.entry("شهاده", List.of("equivalence-diplome")),
+            Map.entry("شهادة", List.of("equivalence-diplome")),
+            Map.entry("إقامة", List.of(
+                    "attestation-de-residence-tout-ce-que-vous-devez-savoir", "residence-certificate")),
+            Map.entry("اقامة", List.of(
+                    "attestation-de-residence-tout-ce-que-vous-devez-savoir", "residence-certificate")),
             Map.entry("biometrique", List.of("demande-de-passeport-biometrique")),
             Map.entry("biometric", List.of("demande-de-passeport-biometrique")),
             Map.entry("carte", List.of("national-id-card-renewal", "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
             Map.entry("identite", List.of("national-id-card-renewal", "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
             Map.entry("cin", List.of("national-id-card-renewal", "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("kart", List.of("national-id-card-renewal", "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("bitaqa", List.of("national-id-card-renewal", "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("bataqa", List.of("national-id-card-renewal", "comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin")),
+            Map.entry("diploum", List.of("equivalence-diplome")),
+            Map.entry("mou3adala", List.of("equivalence-diplome")),
+            Map.entry("moadala", List.of("equivalence-diplome")),
+            Map.entry("eqivalance", List.of("equivalence-diplome")),
+            Map.entry("tajdid", List.of(
+                    "comment-obtenir-un-passeport-tunisien-facilement",
+                    "national-id-card-renewal")),
             Map.entry("timbre", List.of("timbre-fiscal")),
             Map.entry("fiscal", List.of("timbre-fiscal")),
             Map.entry("permis", List.of("renouvellement-permis")),
@@ -80,7 +150,6 @@ public class ChatQueryMatcher {
             "adresse",
             "localisation",
             "itineraire",
-            "carte",
             "map",
             "gps",
             "commissariat",
@@ -91,7 +160,22 @@ public class ChatQueryMatcher {
             "office",
             "location",
             "nearest",
-            "proche");
+            "proche",
+            // Derja / Arabizi / Arabic (avoid bare "win" — too ambiguous in English)
+            "win nemchi",
+            "wein nemchi",
+            "win n9addem",
+            "win n9adem",
+            "win el bureau",
+            "wein el bureau",
+            "9rib meni",
+            "qrib meni",
+            "andek bureau",
+            "فين",
+            "وين نمشي",
+            "وين نقدر",
+            "اقرب",
+            "قريب مني");
 
     private static final List<String> OFF_TOPIC_CUES = List.of(
             "meteo",
@@ -174,12 +258,14 @@ public class ChatQueryMatcher {
                         + "tunisie|etranger|le premier|le second|la premiere|la deuxieme|"
                         + "option 1|option 2|premier|deuxieme|celui la|celle la|"
                         + "how|how to|the first|the second|both|this one|that one|"
-                        + "go on|continue|next|please|pls|bro|yes|yeah|yep|nope)$")) {
+                        + "go on|continue|next|please|pls|bro|yes|yeah|yep|nope|"
+                        + "ey|iyeh|iye|eh|behi|mazel|bark|saa7i|sa7i|la|non merci)$")) {
             return true;
         }
-        // "ok i wanna choose", "give me the papers", typos included
+        // "ok i wanna choose", "give me the papers", Derja doc asks
         if (normalized.matches(".*(choose|choisir|option|papers|pappers|papiers|documents|docs|"
-                + "pieces|justificatifs|what do i need|give me|liste).*" )
+                + "pieces|justificatifs|what do i need|give me|liste|"
+                + "awra9|awraq|wra9et|wraqet|chnoua el awrak|chnu el awra9).*" )
                 && trimmed.length() < 120) {
             return true;
         }
@@ -212,6 +298,7 @@ public class ChatQueryMatcher {
             return false;
         }
         String normalized = normalize(query);
+        String raw = query.toLowerCase(Locale.FRENCH);
         return List.of(
                         "paper",
                         "papers",
@@ -229,9 +316,43 @@ public class ChatQueryMatcher {
                         "requis",
                         "what do i need",
                         "quoi apporter",
-                        "liste")
+                        "liste",
+                        "awra9",
+                        "awraq",
+                        "wra9et",
+                        "wraqet",
+                        "awrak",
+                        "chnoua",
+                        "chnu")
                 .stream()
-                .anyMatch(normalized::contains);
+                .anyMatch(normalized::contains)
+                || raw.contains("وثائق")
+                || raw.contains("أوراق")
+                || raw.contains("اوراق");
+    }
+
+    /** User wants an interactive checklist of papers / steps. */
+    public boolean isChecklistAsk(String query) {
+        if (query == null || query.isBlank()) {
+            return false;
+        }
+        String normalized = normalize(query);
+        return List.of(
+                        "checklist",
+                        "check list",
+                        "liste a cocher",
+                        "to-do",
+                        "todo",
+                        "build my list",
+                        "ma liste",
+                        "liste des documents",
+                        "liste des papiers",
+                        "3awenni na3mel liste",
+                        "aamel liste",
+                        "amel liste")
+                .stream()
+                .anyMatch(normalized::contains)
+                || isDocumentAsk(query);
     }
 
     public boolean isCrisisQuery(String query) {
@@ -290,7 +411,8 @@ public class ChatQueryMatcher {
                 .replaceAll("[!?.]+", " ")
                 .replaceAll("\\s+", " ")
                 .strip();
-        if (normalized.matches("^(salut|hello|hi|hey|bonjour|bonsoir|hola|yo|salaam|salam)( again| encore| a toi| a vous)?$")) {
+        if (normalized.matches("^(salut|hello|hi|hey|bonjour|bonsoir|hola|yo|salaam|salam|ahlan|aslema|"
+                        + "marhba|bonne journee|bonne soiree)( again| encore| a toi| a vous)?$")) {
             return true;
         }
         if (normalized.matches("^(merci|thanks|thank you|ok|daccord|d accord|bye|au revoir)$")) {
@@ -326,6 +448,28 @@ public class ChatQueryMatcher {
         return extractSearchTerms(trimmed).isEmpty() && trimmed.length() < 10;
     }
 
+    /** Arabic / Derja civic words → French DB search terms (titles/slugs are FR). */
+    private static final Map<String, String> ARABIC_TO_SEARCH = Map.ofEntries(
+            Map.entry("باسبور", "passeport"),
+            Map.entry("پاسپور", "passeport"),
+            Map.entry("باسپور", "passeport"),
+            Map.entry("جواز", "passeport"),
+            Map.entry("بطاقة", "identite"),
+            Map.entry("بطاقه", "identite"),
+            Map.entry("تعريف", "identite"),
+            Map.entry("كارط", "identite"),
+            Map.entry("معادلة", "equivalence"),
+            Map.entry("شهادة", "diplome"),
+            Map.entry("شهاده", "diplome"),
+            Map.entry("إقامة", "residence"),
+            Map.entry("اقامة", "residence"),
+            Map.entry("رخصة", "permis"),
+            Map.entry("قيادة", "permis"),
+            Map.entry("تونس", "tunisie"),
+            Map.entry("تجديد", "renouveler"),
+            Map.entry("نجدد", "passeport"),
+            Map.entry("نبدل", "renouveler"));
+
     public List<String> extractSearchTerms(String query) {
         if (query == null || query.isBlank()) {
             return List.of();
@@ -344,6 +488,14 @@ public class ChatQueryMatcher {
                 break;
             }
         }
+
+        // Arabic script is stripped by the latin split above — map civic Arabic → FR terms.
+        for (Map.Entry<String, String> entry : ARABIC_TO_SEARCH.entrySet()) {
+            String key = normalize(entry.getKey());
+            if (!key.isBlank() && normalized.contains(key)) {
+                terms.add(entry.getValue());
+            }
+        }
         return List.copyOf(terms);
     }
 
@@ -356,17 +508,137 @@ public class ChatQueryMatcher {
         LinkedHashSet<String> slugs = new LinkedHashSet<>();
 
         for (Map.Entry<String, List<String>> entry : INTENT_SLUGS.entrySet()) {
-            if (normalized.contains(entry.getKey())) {
+            String key = normalize(entry.getKey());
+            if (!key.isBlank() && normalized.contains(key)) {
                 slugs.addAll(entry.getValue());
+            }
+        }
+
+        // Topic disambiguation: "باسبور" without CIN words → passport only.
+        TopicHint topic = detectTopicHint(normalized);
+        if (topic == TopicHint.PASSPORT) {
+            slugs.removeIf(slug -> slug.contains("identite") || slug.contains("cin") || slug.equals("national-id-card-renewal"));
+            if (slugs.isEmpty()) {
+                slugs.add("comment-obtenir-un-passeport-tunisien-facilement");
+                slugs.add("demande-de-passeport-biometrique");
+            }
+        } else if (topic == TopicHint.CIN) {
+            slugs.removeIf(slug -> slug.contains("passeport"));
+            if (slugs.isEmpty()) {
+                slugs.add("national-id-card-renewal");
+                slugs.add("comment-obtenir-et-renouveler-votre-carte-didentite-nationale-cin");
             }
         }
         return List.copyOf(slugs);
     }
 
+    public enum TopicHint {
+        PASSPORT,
+        CIN,
+        MIXED,
+        NONE
+    }
+
+    /** Strong topic cue so passport questions don't land on CIN (and vice versa). */
+    public TopicHint detectTopicHint(String queryOrNormalized) {
+        String n = normalize(queryOrNormalized == null ? "" : queryOrNormalized);
+        boolean passport = List.of(
+                        "باسبور",
+                        "پاسپور",
+                        "باسپور",
+                        "جواز",
+                        "passeport",
+                        "passport",
+                        "paspor",
+                        "pasport",
+                        "jawaz")
+                .stream()
+                .anyMatch(cue -> n.contains(normalize(cue)));
+        boolean cin = List.of(
+                        "بطاقه",
+                        "بطاقة",
+                        "تعريف",
+                        "كارط",
+                        "سي ان",
+                        " cin ",
+                        "carte didentite",
+                        "identite",
+                        "bitaqa",
+                        "bataqa",
+                        "kart")
+                .stream()
+                .anyMatch(cue -> {
+                    String k = normalize(cue);
+                    if (" cin ".equals(k) || k.equals("cin")) {
+                        return n.matches(".*\\bcin\\b.*");
+                    }
+                    return n.contains(k);
+                });
+        if (passport && cin) {
+            return TopicHint.MIXED;
+        }
+        if (passport) {
+            return TopicHint.PASSPORT;
+        }
+        if (cin) {
+            return TopicHint.CIN;
+        }
+        return TopicHint.NONE;
+    }
+
     public String normalize(String text) {
-        String withoutAccents = Normalizer.normalize(text.toLowerCase(Locale.FRENCH), Normalizer.Form.NFD)
+        if (text == null) {
+            return "";
+        }
+        String arabizi = expandArabiziDigits(text.toLowerCase(Locale.FRENCH));
+        String withoutAccents = Normalizer.normalize(arabizi, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "");
-        return withoutAccents.replace("œ", "oe").replace("æ", "ae");
+        return foldArabicOrthography(withoutAccents.replace("œ", "oe").replace("æ", "ae"));
+    }
+
+    /**
+     * Collapse common ASR / dialect spelling differences so "بطاقه" matches "بطاقة",
+     * "أ" matches "ا", etc.
+     */
+    private String foldArabicOrthography(String text) {
+        if (text.isEmpty()) {
+            return text;
+        }
+        StringBuilder out = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            switch (c) {
+                case 'أ', 'إ', 'آ', 'ٱ' -> out.append('ا');
+                case 'ة' -> out.append('ه');
+                case 'ى' -> out.append('ي');
+                case 'ؤ' -> out.append('و');
+                case 'ئ' -> out.append('ي');
+                case 'ـ' -> {
+                    /* tatweel — drop */
+                }
+                default -> out.append(c);
+            }
+        }
+        return out.toString();
+    }
+
+    /** Map chat Arabizi digits (3=ع, 7=ح, 9=ق…) to Latin letters for matching. */
+    private String expandArabiziDigits(String text) {
+        StringBuilder out = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            switch (c) {
+                case '3' -> out.append('a'); // ع
+                case '7' -> out.append('h'); // ح
+                case '9' -> out.append('q'); // ق
+                case '8' -> out.append('g'); // غ
+                case '5' -> out.append("kh"); // خ
+                case '2' -> out.append('a'); // ء/أ
+                case '6' -> out.append('t'); // ط
+                default -> out.append(c);
+            }
+        }
+        return out.toString();
     }
 
     /**

@@ -2,6 +2,7 @@ package com.example.dossia.chat;
 
 import com.example.dossia.auth.security.UserPrincipal;
 import com.example.dossia.chat.domain.ChatSession;
+import com.example.dossia.chat.dto.ChatChecklistItemDto;
 import com.example.dossia.chat.dto.ChatRequest;
 import com.example.dossia.chat.dto.ChatResponse;
 import com.example.dossia.chat.dto.ChatSourceDto;
@@ -145,7 +146,7 @@ public class ChatService {
             Ne donne AUCUN conseil sur se faire du mal. Ne continue pas sur le sujet du suicide.
             """;
 
-    private final GeminiClient geminiClient;
+    private final LlmGateway llmGateway;
     private final GeminiProperties geminiProperties;
     private final ProcedureRetrievalService retrievalService;
     private final ProcedureContextBuilder contextBuilder;
@@ -156,7 +157,7 @@ public class ChatService {
     private final ProcedureRepository procedureRepository;
 
     public ChatService(
-            GeminiClient geminiClient,
+            LlmGateway llmGateway,
             GeminiProperties geminiProperties,
             ProcedureRetrievalService retrievalService,
             ProcedureContextBuilder contextBuilder,
@@ -165,7 +166,7 @@ public class ChatService {
             ChatQueryExpander queryExpander,
             ChatQueryMatcher queryMatcher,
             ProcedureRepository procedureRepository) {
-        this.geminiClient = geminiClient;
+        this.llmGateway = llmGateway;
         this.geminiProperties = geminiProperties;
         this.retrievalService = retrievalService;
         this.contextBuilder = contextBuilder;
@@ -183,7 +184,7 @@ public class ChatService {
         boolean hasHistory = !history.isEmpty();
         boolean followUp = hasHistory
                 && (queryMatcher.isFollowUp(message) || queryMatcher.isThreadContinuation(message));
-        Language replyLang = resolveReplyLanguage(lang, message, history);
+        Language replyLang = resolveReplyLanguage(lang, message, history, request.agentId());
 
         if (queryMatcher.isCrisisQuery(message)) {
             AnswerResult answerResult = generateSpecialSafely(
@@ -251,7 +252,12 @@ public class ChatService {
                 request, principal, answerResult.answer(), sources, procedures, answerResult.model(), replyLang);
     }
 
-    private Language resolveReplyLanguage(Language requested, String message, List<ConversationTurn> history) {
+    private Language resolveReplyLanguage(
+            Language requested, String message, List<ConversationTurn> history, String agentId) {
+        Language fromAgent = languageFromAgent(agentId);
+        if (fromAgent != null) {
+            return fromAgent;
+        }
         List<String> priorUsers = history.stream()
                 .filter(turn -> "user".equals(turn.role()))
                 .map(ConversationTurn::content)
@@ -269,21 +275,50 @@ public class ChatService {
         return detected;
     }
 
+    /** Locked voice-agent language wins over auto-detect. */
+    private Language languageFromAgent(String agentId) {
+        if (agentId == null || agentId.isBlank()) {
+            return null;
+        }
+        return switch (agentId.strip().toLowerCase()) {
+            case "sofia" -> Language.FR;
+            case "yasmine" -> Language.TN;
+            case "alex" -> Language.EN;
+            default -> null;
+        };
+    }
+
     private String withLanguage(String systemPrompt, Language replyLang) {
         String rule = switch (replyLang) {
             case EN -> """
 
                     LANGUAGE (mandatory): Reply entirely in clear English.
                     Keep procedure titles as they appear in the context (may be French).
+                    Persona: You are Alex, Dosya's English guide — warm, precise, civic and practical.
                     """;
-            case AR, TN -> """
+            case AR -> """
 
-                    اللغة (إلزامي): أجب بالعربية الفصحى الواضحة (أو باللهجة التونسية إذا كتب المستخدم بها).
+                    اللغة (إلزامي): أجب بالعربية الفصحى الواضحة.
                     يمكنك الإبقاء على عناوين الإجراءات كما هي في السياق.
+                    """;
+            case TN -> """
+
+                    اللغة (إلزامي جداً): جاوب دائماً بالدارجة التونسية الطبيعية (تونسي / Derja)، مش بالفصحى.
+                    أنتِ ياسمين، مرشدة دوسيا — بنت تونسية ودودة، واضحة، وعملية.
+
+                    قواعد الدارجة:
+                    - احكي كيف التونسي في الحياة اليومية: عسلامة، شنوة تحب، كيفاش، وين نمشي، الأوراڨ/الأوراق، بطاقة تعريف، پاسپور/جواز...
+                    - اكتب بالعربي (حروف عربية)، مش Latin Arabizi إلا إذا المستخدم كتب Arabizi صراحة.
+                    - ممنوع الفصحى الثقيلة (مثل: "ينبغي عليك أن تقوم بـ...") — قولها تونسي: "لازم تعمل..." / "نجم نعاونك..."
+                    - ممنوع كلمات غريبة، مخترعة، أو ترجمة حرفية بشعة. إذا ما فهمتش سؤال المستخدم، اسألو بالدارجة باش يوضح.
+                    - خلّي عناوين الإجراءات الرسمية كما في السياق (غالباً بالفرنسية) وفسّرها بالدارجة حواليه.
+                    - خلّي الجواب قصير وواضح ومرتب (نقاط إذا لزم).
+                    - راهي إجراءات إدارية تونسية فقط — بلا فلسفة وبلا كلام فاضي.
                     """;
             case FR -> """
 
                     LANGUE (obligatoire): Réponds entièrement en français clair.
+                    Persona: Tu es Sofia, le guide Dosya en français — chaleureuse, précise et pratique.
                     """;
         };
         return systemPrompt + rule;
@@ -293,7 +328,9 @@ public class ChatService {
         return switch (lang) {
             case EN -> "If you are in distress, contact emergency services immediately (190 in Tunisia) "
                     + "or someone you trust. Dosya only helps with administrative procedures.";
-            case AR, TN -> "إذا كنت في ضيق، اتصل فوراً بالطوارئ (190 في تونس) أو بشخص تثق به. "
+            case TN -> "إذا فيك ضيق، اتصال بالطوارئ فورا (190 في تونس) وإلا لشخص تثق فيه. "
+                    + "دوسيا غير تعينك في الإجراءات الإدارية برك.";
+            case AR -> "إذا كنت في ضيق، اتصل فوراً بالطوارئ (190 في تونس) أو بشخص تثق به. "
                     + "دوسيا مساعد للإجراءات الإدارية فقط.";
             case FR -> "Si vous êtes en détresse, contactez immédiatement les urgences (190 en Tunisie) "
                     + "ou une personne de confiance. Dosya n'est qu'un assistant pour les démarches administratives.";
@@ -304,7 +341,9 @@ public class ChatService {
         return switch (lang) {
             case EN -> "Sorry — I can only help with Tunisian administrative procedures "
                     + "(national ID, passport, diploma equivalence, residence…). Ask me something in that area!";
-            case AR, TN -> "عذراً، أستطيع المساعدة فقط في الإجراءات الإدارية التونسية "
+            case TN -> "سامحني، نجمش نعاونك غير على الإجراءات الإدارية التونسية "
+                    + "(بطاقة تعريف، پاسپور، معادلة، إقامة...). قولّي شنوة تحتاج بالضبط!";
+            case AR -> "عذراً، أستطيع المساعدة فقط في الإجراءات الإدارية التونسية "
                     + "(بطاقة تعريف، جواز سفر، معادلة شهادة، إقامة…). اسألني في هذا المجال!";
             case FR -> "Désolé, je ne peux pas vous aider sur ce sujet. "
                     + "Je suis Dosya — je suis uniquement fait pour les démarches administratives tunisiennes "
@@ -389,7 +428,7 @@ public class ChatService {
             return retrieved;
         }
 
-        return queryExpander.expand(geminiClient, message)
+        return queryExpander.expand(llmGateway, message)
                 .map(expanded -> mergeRetrieved(retrieved, retrievalService.retrieve(expanded, lang)))
                 .orElse(retrieved);
     }
@@ -437,29 +476,29 @@ public class ChatService {
             String message,
             List<ConversationTurn> history,
             Language replyLang) {
-        if (!geminiProperties.isConfigured()) {
+        if (!llmGateway.isChatConfigured()) {
             return new AnswerResult(buildOfflineAnswer(message, retrieved, mode, replyLang), "offline-fallback");
         }
 
         try {
-            String answer = generateAnswer(mode, retrieved, message, history, replyLang);
-            return new AnswerResult(answer, geminiProperties.chatModel());
+            LlmGateway.LlmText answer = generateAnswer(mode, retrieved, message, history, replyLang);
+            return new AnswerResult(answer.text(), answer.model());
         } catch (GeminiException ex) {
             org.slf4j.LoggerFactory.getLogger(ChatService.class)
-                    .warn("Gemini unavailable ({}), using offline procedure details", ex.getMessage());
+                    .warn("LLM unavailable ({}), using offline procedure details", ex.getMessage());
             return new AnswerResult(buildOfflineAnswer(message, retrieved, mode, replyLang), "offline-fallback");
         }
     }
 
     private AnswerResult generateSpecialSafely(
             String systemPrompt, String message, List<ConversationTurn> history, String offline) {
-        if (!geminiProperties.isConfigured()) {
+        if (!llmGateway.isChatConfigured()) {
             return new AnswerResult(offline, "offline-fallback");
         }
         try {
-            String answer = geminiClient.generate(
+            LlmGateway.LlmText answer = llmGateway.generate(
                     systemPrompt, history, "Message utilisateur:\n" + message, 0.3);
-            return new AnswerResult(answer, geminiProperties.chatModel());
+            return new AnswerResult(answer.text(), answer.model());
         } catch (GeminiException ex) {
             return new AnswerResult(offline, "offline-fallback");
         }
@@ -468,16 +507,16 @@ public class ChatService {
     private AnswerResult generateGreetingSafely(
             String message, List<ConversationTurn> history, Language replyLang) {
         String offline = buildOfflineGreeting(message, replyLang);
-        if (!geminiProperties.isConfigured()) {
+        if (!llmGateway.isChatConfigured()) {
             return new AnswerResult(offline, "offline-fallback");
         }
         try {
-            String answer = geminiClient.generate(
+            LlmGateway.LlmText answer = llmGateway.generate(
                     withLanguage(GREETING_SYSTEM_PROMPT, replyLang),
                     history,
                     "Message utilisateur:\n" + message,
                     0.4);
-            return new AnswerResult(answer, geminiProperties.chatModel());
+            return new AnswerResult(answer.text(), answer.model());
         } catch (GeminiException ex) {
             return new AnswerResult(offline, "offline-fallback");
         }
@@ -489,7 +528,9 @@ public class ChatService {
             case EN -> (normalized.contains("evening") ? "Good evening" : "Hi")
                     + "! I'm Dosya, your assistant for Tunisian administrative procedures. "
                     + "Ask me about passports, national ID (CIN), diploma equivalence, residence…";
-            case AR, TN -> "أهلاً! أنا دوسيا، مساعدك للإجراءات الإدارية في تونس. "
+            case TN -> "عسلامة! أنا ياسمين من دوسيا. نجم نعاونك في الإجراءات الإدارية في تونس: "
+                    + "پاسپور، بطاقة تعريف، معادلة، إقامة… قولّي شنوة تحتاج.";
+            case AR -> "أهلاً! أنا دوسيا، مساعدك للإجراءات الإدارية في تونس. "
                     + "اسألني عن جواز السفر، بطاقة التعريف، معادلة الشهادة، الإقامة…";
             case FR -> {
                 String hello = normalized.contains("bonsoir") ? "Bonsoir" : "Bonjour";
@@ -505,51 +546,53 @@ public class ChatService {
         String offline = switch (replyLang) {
             case EN -> "Your message is a bit unclear. Tell me which procedure you need "
                     + "(e.g. passport renewal, national ID, diploma equivalence, residence certificate).";
-            case AR, TN -> "رسالتك غير واضحة بما يكفي. وضّح الإجراء الذي تحتاجه "
+            case TN -> "ما فهمتش برشا. وضّحلي شنوة الإجراء اللي تحب عليه "
+                    + "(مثلا تجديد پاسپور، بطاقة تعريف، معادلة، شهادة إقامة).";
+            case AR -> "رسالتك غير واضحة بما يكفي. وضّح الإجراء الذي تحتاجه "
                     + "(مثلاً تجديد جواز السفر، بطاقة تعريف، معادلة شهادة، شهادة إقامة).";
             case FR -> "Votre message est trop court ou peu clair. Reformulez votre démarche "
                     + "(ex. passeport, CIN, équivalence de diplôme, attestation de résidence).";
         };
-        if (!geminiProperties.isConfigured()) {
+        if (!llmGateway.isChatConfigured()) {
             return new AnswerResult(offline, "offline-fallback");
         }
         try {
-            String answer = geminiClient.generate(
+            LlmGateway.LlmText answer = llmGateway.generate(
                     withLanguage(CLARIFY_SYSTEM_PROMPT, replyLang),
                     history,
                     "Message utilisateur:\n" + message,
                     0.2);
-            return new AnswerResult(answer, geminiProperties.chatModel());
+            return new AnswerResult(answer.text(), answer.model());
         } catch (GeminiException ex) {
             return new AnswerResult(offline, "offline-fallback");
         }
     }
 
-    private String generateAnswer(
+    private LlmGateway.LlmText generateAnswer(
             ResponseMode mode,
             List<ProcedureRetrievalService.RetrievedProcedure> retrieved,
             String message,
             List<ConversationTurn> history,
             Language replyLang) {
         return switch (mode) {
-            case STRONG_RAG -> geminiClient.generate(
+            case STRONG_RAG -> llmGateway.generate(
                     withLanguage(RAG_SYSTEM_PROMPT, replyLang),
                     history,
                     buildRagUserPrompt(retrieved, message),
                     0.2);
-            case WEAK_RAG -> geminiClient.generate(
+            case WEAK_RAG -> llmGateway.generate(
                     withLanguage(WEAK_RAG_SYSTEM_PROMPT, replyLang),
                     history,
                     buildRagUserPrompt(retrieved, message),
                     0.35);
-            case FOLLOWUP -> geminiClient.generate(
+            case FOLLOWUP -> llmGateway.generate(
                     withLanguage(FOLLOWUP_SYSTEM_PROMPT, replyLang),
                     history,
                     retrieved.isEmpty()
                             ? "Message de suivi de l'utilisateur:\n" + message
                             : buildRagUserPrompt(retrieved, message),
                     0.3);
-            case FALLBACK -> geminiClient.generate(
+            case FALLBACK -> llmGateway.generate(
                     withLanguage(FALLBACK_SYSTEM_PROMPT, replyLang),
                     history,
                     buildFallbackUserPrompt(message),
@@ -597,24 +640,31 @@ public class ChatService {
         StringBuilder answer = new StringBuilder();
         boolean wantDocs = queryMatcher.isDocumentAsk(message)
                 || mode == ResponseMode.FOLLOWUP
-                || mode == ResponseMode.STRONG_RAG;
+                || mode == ResponseMode.STRONG_RAG
+                || replyLang == Language.TN
+                || replyLang == Language.AR;
 
         if ((mode == ResponseMode.STRONG_RAG
                         || mode == ResponseMode.WEAK_RAG
                         || mode == ResponseMode.FOLLOWUP)
                 && !retrieved.isEmpty()) {
+            // Derja / Arabic: conversational, not a French admin form dump.
+            if (replyLang == Language.TN || replyLang == Language.AR) {
+                return buildConversationalOfflineAnswer(retrieved.get(0).procedure(), replyLang, wantDocs);
+            }
+
             Procedure top = retrieved.get(0).procedure();
             answer.append(switch (replyLang) {
                 case EN -> "Here's what Dosya has on **" + top.getTitleFr() + "**:\n\n";
-                case AR, TN -> "إليك ما لدى دوسيا حول **" + top.getTitleFr() + "**:\n\n";
                 case FR -> "Voici ce que Dosya a pour **" + top.getTitleFr() + "** :\n\n";
+                default -> "Here's what Dosya has on **" + top.getTitleFr() + "**:\n\n";
             });
 
             if (wantDocs && top.getDocuments() != null && !top.getDocuments().isEmpty()) {
                 answer.append(switch (replyLang) {
                     case EN -> "**Required documents**\n";
-                    case AR, TN -> "**الوثائق المطلوبة**\n";
                     case FR -> "**Documents requis**\n";
+                    default -> "**Required documents**\n";
                 });
                 top.getDocuments().stream()
                         .sorted(Comparator.comparingInt(com.example.dossia.procedure.domain.ProcedureDocument::getSortOrder))
@@ -625,8 +675,8 @@ public class ChatService {
             if (top.getSteps() != null && !top.getSteps().isEmpty()) {
                 answer.append(switch (replyLang) {
                     case EN -> "**Main steps**\n";
-                    case AR, TN -> "**الخطوات الرئيسية**\n";
                     case FR -> "**Étapes principales**\n";
+                    default -> "**Main steps**\n";
                 });
                 top.getSteps().stream()
                         .sorted(Comparator.comparingInt(com.example.dossia.procedure.domain.ProcedureStep::getStepNumber))
@@ -642,30 +692,30 @@ public class ChatService {
             if (top.getFees() != null && !top.getFees().isBlank()) {
                 answer.append(switch (replyLang) {
                     case EN -> "**Fees:** ";
-                    case AR, TN -> "**الرسوم:** ";
                     case FR -> "**Frais :** ";
+                    default -> "**Fees:** ";
                 }).append(top.getFees()).append("\n\n");
             }
             if (top.getProcessingTime() != null && !top.getProcessingTime().isBlank()) {
                 answer.append(switch (replyLang) {
                     case EN -> "**Processing time:** ";
-                    case AR, TN -> "**المدة:** ";
                     case FR -> "**Délai :** ";
+                    default -> "**Processing time:** ";
                 }).append(top.getProcessingTime()).append("\n\n");
             }
             if (top.getSourceUrl() != null && !top.getSourceUrl().isBlank()) {
                 answer.append(switch (replyLang) {
                     case EN -> "Source: ";
-                    case AR, TN -> "المصدر: ";
                     case FR -> "Source : ";
+                    default -> "Source: ";
                 }).append(top.getSourceUrl()).append("\n\n");
             }
 
             if (retrieved.size() > 1) {
                 answer.append(switch (replyLang) {
                     case EN -> "Related procedures:\n";
-                    case AR, TN -> "إجراءات ذات صلة:\n";
                     case FR -> "Procédures liées :\n";
+                    default -> "Related procedures:\n";
                 });
                 for (int i = 1; i < Math.min(retrieved.size(), 3); i++) {
                     answer.append("- ").append(retrieved.get(i).procedure().getTitleFr()).append('\n');
@@ -675,8 +725,8 @@ public class ChatService {
 
             answer.append(switch (replyLang) {
                 case EN -> "_Full AI answers are temporarily limited — this is the verified Dosya procedure content._";
-                case AR, TN -> "_الردود الذكية محدودة مؤقتاً — هذا محتوى الإجراء الموثق على دوسيا._";
                 case FR -> "_L'IA complète est limitée temporairement — voici le contenu vérifié Dosya._";
+                default -> "_Full AI answers are temporarily limited — this is the verified Dosya procedure content._";
             });
             return answer.toString().strip();
         }
@@ -687,13 +737,16 @@ public class ChatService {
             answer.append(switch (replyLang) {
                 case EN -> "I understand you're continuing the conversation, but I couldn't load procedure details right now. "
                         + "Try again with “passport documents in Tunisia”.\n\n";
-                case AR, TN -> "فهمت السياق لكن تعذّر تحميل تفاصيل الإجراء. أعد المحاولة.\n\n";
+                case TN -> "فهمت السياق، أما ما نجمتش نحمّل تفاصيل الإجراء توّا. عاود جرّب بكلمات أوضح "
+                        + "كـ «أوراق الپاسپور في تونس».\n\n";
+                case AR -> "فهمت السياق لكن تعذّر تحميل تفاصيل الإجراء. أعد المحاولة.\n\n";
                 case FR -> "Je comprends la suite, mais je n'ai pas pu charger les détails. Réessayez.\n\n";
             });
         } else {
             answer.append(switch (replyLang) {
                 case EN -> "I couldn't find a verified procedure matching your question";
-                case AR, TN -> "لم أجد إجراءً موثقاً يطابق سؤالك";
+                case TN -> "ما لقيتش إجراء موثّق يطابق سؤالك";
+                case AR -> "لم أجد إجراءً موثقاً يطابق سؤالك";
                 case FR -> "Je n'ai pas trouvé de procédure vérifiée correspondant à votre question";
             });
             if (message != null && message.length() > 3) {
@@ -704,11 +757,112 @@ public class ChatService {
 
         answer.append(switch (replyLang) {
             case EN -> "Try again in a moment, or rephrase with keywords like passport, CIN, equivalence, residence.";
-            case AR, TN -> "أعد المحاولة بعد لحظات، أو أعد صياغة السؤال بكلمات مثل جواز سفر، بطاقة تعريف، معادلة، إقامة.";
+            case TN -> "عاود قولّي بوضوح أكثر، مثلا: تبديل الپاسپور، بطاقة تعريف، معادلة شهادة، إقامة.";
+            case AR -> "أعد المحاولة بعد لحظات، أو أعد صياغة السؤال بكلمات مثل جواز سفر، بطاقة تعريف، معادلة، إقامة.";
             case FR -> "Réessayez dans quelques instants, ou reformulez avec des mots-clés "
                     + "comme passeport, CIN, équivalence, résidence.";
         });
         return answer.toString().strip();
+    }
+
+    /** Natural spoken Derja / Arabic answer from procedure data (no French title dump). */
+    private String buildConversationalOfflineAnswer(Procedure top, Language replyLang, boolean wantDocs) {
+        String topic = friendlyProcedureLabel(top, replyLang);
+        StringBuilder answer = new StringBuilder();
+        if (replyLang == Language.TN) {
+            answer.append("باهي، فهمتك — تحكي على ").append(topic).append(".\n\n");
+        } else {
+            answer.append("حسناً، بخصوص ").append(topic).append(":\n\n");
+        }
+
+        if (wantDocs && top.getDocuments() != null && !top.getDocuments().isEmpty()) {
+            answer.append(replyLang == Language.TN ? "الأوراق اللي تلزمك تقريبًا:\n" : "الوثائق المطلوبة تقريباً:\n");
+            top.getDocuments().stream()
+                    .sorted(Comparator.comparingInt(com.example.dossia.procedure.domain.ProcedureDocument::getSortOrder))
+                    .limit(6)
+                    .forEach(doc -> answer
+                            .append("- ")
+                            .append(pickLocalized(null, doc.getTitleAr(), doc.getTitleFr(), replyLang))
+                            .append('\n'));
+            answer.append('\n');
+        }
+
+        if (top.getSteps() != null && !top.getSteps().isEmpty()) {
+            answer.append(replyLang == Language.TN ? "كيفاش تمشي الخطوة بخطوة:\n" : "الخطوات الرئيسية:\n");
+            top.getSteps().stream()
+                    .sorted(Comparator.comparingInt(com.example.dossia.procedure.domain.ProcedureStep::getStepNumber))
+                    .limit(5)
+                    .forEach(step -> answer
+                            .append(step.getStepNumber())
+                            .append(". ")
+                            .append(pickLocalized(null, step.getTitleAr(), step.getTitleFr(), replyLang))
+                            .append('\n'));
+            answer.append('\n');
+        }
+
+        if (top.getFees() != null && !top.getFees().isBlank()) {
+            answer.append(replyLang == Language.TN ? "الثمن تقريبًا: " : "الرسوم تقريباً: ")
+                    .append(top.getFees())
+                    .append('\n');
+        }
+        if (top.getProcessingTime() != null && !top.getProcessingTime().isBlank()) {
+            answer.append(replyLang == Language.TN ? "المدّة تقريبًا: " : "المدة تقريباً: ")
+                    .append(top.getProcessingTime())
+                    .append('\n');
+        }
+
+        answer.append('\n');
+        if (replyLang == Language.TN) {
+            answer.append("تحب نزيدك تفاصيل أكثر، ولا نقولّك وين تمشي تقدّم الملف؟");
+        } else {
+            answer.append("هل تريد تفاصيل إضافية أو مكان تقديم الملف؟");
+        }
+        return answer.toString().strip();
+    }
+
+    private String friendlyProcedureLabel(Procedure procedure, Language lang) {
+        String slug = procedure.getSlug() == null ? "" : procedure.getSlug().toLowerCase();
+        if (slug.contains("passeport")) {
+            return lang == Language.TN ? "تجديد الپاسپور" : "تجديد جواز السفر";
+        }
+        if (slug.contains("identite") || slug.contains("cin") || slug.contains("national-id")) {
+            return lang == Language.TN ? "بطاقة التعريف (CIN)" : "بطاقة التعريف الوطنية";
+        }
+        if (slug.contains("equivalence") || slug.contains("diplome")) {
+            return lang == Language.TN ? "معادلة الشهادة" : "معادلة الشهادة";
+        }
+        if (slug.contains("residence")) {
+            return lang == Language.TN ? "شهادة الإقامة" : "شهادة الإقامة";
+        }
+        return pickLocalized(procedure.getTitleTn(), procedure.getTitleAr(), procedure.getTitleFr(), lang);
+    }
+
+    private String pickLocalized(String tn, String ar, String fr, Language lang) {
+        if (lang == Language.TN) {
+            if (tn != null && !tn.isBlank()) {
+                return tn.strip();
+            }
+            if (ar != null && !ar.isBlank() && !looksMostlyLatin(ar)) {
+                return ar.strip();
+            }
+        }
+        if (lang == Language.AR || lang == Language.TN) {
+            if (ar != null && !ar.isBlank() && !looksMostlyLatin(ar)) {
+                return ar.strip();
+            }
+        }
+        return fr == null ? "" : fr.strip();
+    }
+
+    private boolean looksMostlyLatin(String text) {
+        long letters = text.codePoints().filter(Character::isLetter).count();
+        if (letters == 0) {
+            return true;
+        }
+        long latin = text.codePoints()
+                .filter(cp -> Character.UnicodeScript.of(cp) == Character.UnicodeScript.LATIN)
+                .count();
+        return latin * 2 >= letters;
     }
 
     private List<ChatSourceDto> buildSources(
@@ -852,7 +1006,11 @@ public class ChatService {
                         new ChatSuggestionDto("passport", "Renew passport", "How do I renew my Tunisian passport?"),
                         new ChatSuggestionDto("cin", "Renew CIN", "How do I renew my national ID (CIN)?"),
                         new ChatSuggestionDto("diploma", "Diploma equivalence", "How does diploma equivalence work in Tunisia?"));
-                case AR, TN -> List.of(
+                case TN -> List.of(
+                        new ChatSuggestionDto("passport", "تجديد الپاسپور", "كيفاش نجدّد الپاسپور التونسي؟"),
+                        new ChatSuggestionDto("cin", "تجديد بطاقة التعريف", "كيفاش نجدّد بطاقة التعريف؟"),
+                        new ChatSuggestionDto("diploma", "معادلة", "كيفاش نعمل معادلة شهادة؟"));
+                case AR -> List.of(
                         new ChatSuggestionDto("passport", "تجديد جواز السفر", "كيف أجدد جواز سفري التونسي؟"),
                         new ChatSuggestionDto("cin", "تجديد بطاقة التعريف", "كيف أجدد بطاقة التعريف الوطنية؟"),
                         new ChatSuggestionDto("diploma", "معادلة شهادة", "كيف تتم معادلة الشهادة في تونس؟"));
@@ -870,36 +1028,44 @@ public class ChatService {
         if (!wantsDocs) {
             chips.add(switch (replyLang) {
                 case EN -> new ChatSuggestionDto("docs", "Documents needed", "What documents do I need?");
-                case AR, TN -> new ChatSuggestionDto("docs", "الوثائق المطلوبة", "ما هي الوثائق التي أحتاجها؟");
+                case TN -> new ChatSuggestionDto("docs", "الأوراق اللازمة", "شنوة الأوراق اللي نحتاجهم؟");
+                case AR -> new ChatSuggestionDto("docs", "الوثائق المطلوبة", "ما هي الوثائق التي أحتاجها؟");
                 case FR -> new ChatSuggestionDto("docs", "Documents requis", "Quels documents dois-je préparer ?");
             });
         }
         if (!wantsWhere) {
             chips.add(switch (replyLang) {
                 case EN -> new ChatSuggestionDto("where", "Where to go", "Where should I go to submit this?");
-                case AR, TN -> new ChatSuggestionDto("where", "أين أذهب؟", "أين يجب أن أذهب لإيداع الملف؟");
+                case TN -> new ChatSuggestionDto("where", "وين نمشي؟", "وين لازم نمشي باش نقدّم الملف؟");
+                case AR -> new ChatSuggestionDto("where", "أين أذهب؟", "أين يجب أن أذهب لإيداع الملف؟");
                 case FR -> new ChatSuggestionDto("where", "Où aller", "Où dois-je déposer mon dossier ?");
             });
         }
         chips.add(switch (replyLang) {
             case EN -> new ChatSuggestionDto("fees", "Fees & delays", "What are the fees and processing time?");
-            case AR, TN -> new ChatSuggestionDto("fees", "الرسوم والآجال", "كم التكلفة وما هي المدة؟");
+            case TN -> new ChatSuggestionDto("fees", "الثمن والمدة", "قدّاش يلزم و قداش تقعد؟");
+            case AR -> new ChatSuggestionDto("fees", "الرسوم والآجال", "كم التكلفة وما هي المدة؟");
             case FR -> new ChatSuggestionDto("fees", "Frais & délais", "Quels sont les frais et les délais ?");
         });
         chips.add(switch (replyLang) {
             case EN -> new ChatSuggestionDto("abroad", "I'm abroad", "How does this work if I am abroad?");
-            case AR, TN -> new ChatSuggestionDto("abroad", "أنا بالخارج", "كيف تتم الإجراءات إذا كنت بالخارج؟");
+            case TN -> new ChatSuggestionDto("abroad", "نا برّة", "كيفاش نعمل إذا كنت في الخارج؟");
+            case AR -> new ChatSuggestionDto("abroad", "أنا بالخارج", "كيف تتم الإجراءات إذا كنت بالخارج؟");
             case FR -> new ChatSuggestionDto("abroad", "Je suis à l'étranger", "Comment ça se passe si je suis à l'étranger ?");
         });
         return chips.stream().limit(4).toList();
     }
 
     private List<ConversationTurn> loadHistory(UserPrincipal principal, ChatRequest request) {
-        if (principal != null) {
-            List<ConversationTurn> stored =
-                    chatHistoryService.getRecentTurns(principal.getId(), request.sessionId(), HISTORY_MESSAGES);
-            if (!stored.isEmpty()) {
-                return stored;
+        if (principal != null && request.sessionId() != null) {
+            try {
+                List<ConversationTurn> stored =
+                        chatHistoryService.getRecentTurns(principal.getId(), request.sessionId(), HISTORY_MESSAGES);
+                if (!stored.isEmpty()) {
+                    return stored;
+                }
+            } catch (RuntimeException ignored) {
+                // Stale/foreign session id from the client — fall through to request.history().
             }
         }
         // Guests (and first turn before a session exists): client-sent history for multi-turn.
@@ -946,7 +1112,37 @@ public class ChatService {
                 || request.sessionId() != null;
         List<ChatSuggestionDto> suggestions =
                 buildSuggestions(replyLang, request.message(), sources, hasHistory);
-        return new ChatResponse(answer, sources, model, sessionId, nearbyOffices, suggestions);
+        List<ChatChecklistItemDto> checklist = buildChecklist(request.message(), procedures, replyLang);
+        return new ChatResponse(answer, sources, model, sessionId, nearbyOffices, suggestions, checklist);
+    }
+
+    private List<ChatChecklistItemDto> buildChecklist(
+            String message, List<Procedure> procedures, Language replyLang) {
+        if (!queryMatcher.isChecklistAsk(message) || procedures.isEmpty()) {
+            return List.of();
+        }
+        Procedure top = procedures.get(0);
+        if (top.getDocuments() == null || top.getDocuments().isEmpty()) {
+            return List.of();
+        }
+        return top.getDocuments().stream()
+                .sorted(Comparator.comparingInt(com.example.dossia.procedure.domain.ProcedureDocument::getSortOrder))
+                .map(doc -> {
+                    boolean arabic = replyLang == Language.AR || replyLang == Language.TN;
+                    String label = arabic
+                                    && doc.getTitleAr() != null
+                                    && !doc.getTitleAr().isBlank()
+                            ? doc.getTitleAr()
+                            : doc.getTitleFr();
+                    String hint = arabic
+                                    && doc.getDescriptionAr() != null
+                                    && !doc.getDescriptionAr().isBlank()
+                            ? doc.getDescriptionAr()
+                            : doc.getDescriptionFr();
+                    return new ChatChecklistItemDto(
+                            doc.getId().toString(), label, hint != null ? hint : "");
+                })
+                .toList();
     }
 
     private List<NearbyOfficeDto> resolveNearbyOffices(ChatRequest request, List<Procedure> procedures) {
@@ -970,6 +1166,7 @@ public class ChatService {
         if (principal == null) {
             return null;
         }
+        // resolveSession soft-creates when sessionId is missing or unknown (no 404).
         ChatSession session =
                 chatHistoryService.resolveSession(principal.getId(), request.sessionId(), request.message());
         chatHistoryService.appendUserMessage(session, request.message());

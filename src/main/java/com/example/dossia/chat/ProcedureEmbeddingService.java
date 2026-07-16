@@ -1,7 +1,6 @@
 package com.example.dossia.chat;
 
 import com.example.dossia.common.GeminiException;
-import com.example.dossia.config.GeminiProperties;
 import com.example.dossia.procedure.domain.Procedure;
 import com.example.dossia.procedure.domain.ProcedureStatus;
 import com.example.dossia.procedure.repository.ProcedureRepository;
@@ -14,15 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProcedureEmbeddingService {
 
     private final ProcedureRepository procedureRepository;
-    private final GeminiProperties geminiProperties;
+    private final LlmGateway llmGateway;
     private final ProcedureEmbeddingExecutor embeddingExecutor;
 
     public ProcedureEmbeddingService(
             ProcedureRepository procedureRepository,
-            GeminiProperties geminiProperties,
+            LlmGateway llmGateway,
             ProcedureEmbeddingExecutor embeddingExecutor) {
         this.procedureRepository = procedureRepository;
-        this.geminiProperties = geminiProperties;
+        this.llmGateway = llmGateway;
         this.embeddingExecutor = embeddingExecutor;
     }
 
@@ -34,7 +33,7 @@ public class ProcedureEmbeddingService {
 
     @Transactional
     public void embedIfPublished(Procedure procedure) {
-        if (!geminiProperties.isConfigured()) {
+        if (!llmGateway.isEmbedConfigured()) {
             return;
         }
         if (procedure.getStatus() != ProcedureStatus.PUBLISHED) {
@@ -63,8 +62,9 @@ public class ProcedureEmbeddingService {
     }
 
     private void requireConfigured() {
-        if (!geminiProperties.isConfigured()) {
-            throw new GeminiException("Gemini is not configured. Set GEMINI_API_KEY in .env");
+        if (!llmGateway.isEmbedConfigured()) {
+            throw new GeminiException(
+                    "No embedding backend. Set GEMINI_API_KEY or enable Ollama (nomic-embed-text).");
         }
     }
 

@@ -23,19 +23,19 @@ public class ProcedureRetrievalService {
     private static final double INTENT_MATCH_SCORE = 100.0;
 
     private final ProcedureRepository procedureRepository;
-    private final GeminiClient geminiClient;
+    private final LlmGateway llmGateway;
     private final GeminiProperties geminiProperties;
     private final ProcedureLoader procedureLoader;
     private final ChatQueryMatcher queryMatcher;
 
     public ProcedureRetrievalService(
             ProcedureRepository procedureRepository,
-            GeminiClient geminiClient,
+            LlmGateway llmGateway,
             GeminiProperties geminiProperties,
             ProcedureLoader procedureLoader,
             ChatQueryMatcher queryMatcher) {
         this.procedureRepository = procedureRepository;
-        this.geminiClient = geminiClient;
+        this.llmGateway = llmGateway;
         this.geminiProperties = geminiProperties;
         this.procedureLoader = procedureLoader;
         this.queryMatcher = queryMatcher;
@@ -44,9 +44,9 @@ public class ProcedureRetrievalService {
     public List<RetrievedProcedure> retrieve(String query, Language lang) {
         Map<UUID, Double> scores = new LinkedHashMap<>();
 
-        if (geminiProperties.isConfigured()) {
+        if (llmGateway.isEmbedConfigured()) {
             try {
-                float[] queryEmbedding = geminiClient.embed(query);
+                float[] queryEmbedding = llmGateway.embed(query);
                 List<UUID> vectorIds = procedureRepository.findSimilarPublishedIds(
                         VectorUtils.toPgVector(queryEmbedding), geminiProperties.retrievalLimit());
                 for (int i = 0; i < vectorIds.size(); i++) {
@@ -71,6 +71,35 @@ public class ProcedureRetrievalService {
 
         if (scores.isEmpty()) {
             return List.of();
+        }
+
+        // Soft topic boost so embedding noise can't put CIN above "باسبور".
+        ChatQueryMatcher.TopicHint topic = queryMatcher.detectTopicHint(query);
+        if (topic == ChatQueryMatcher.TopicHint.PASSPORT || topic == ChatQueryMatcher.TopicHint.CIN) {
+            Map<UUID, Procedure> peek = new LinkedHashMap<>();
+            procedureLoader.loadWithDetails(List.copyOf(scores.keySet())).forEach(p -> peek.put(p.getId(), p));
+            for (Map.Entry<UUID, Double> entry : scores.entrySet()) {
+                Procedure p = peek.get(entry.getKey());
+                if (p == null || p.getSlug() == null) {
+                    continue;
+                }
+                String slug = p.getSlug().toLowerCase();
+                boolean isPassport = slug.contains("passeport");
+                boolean isCin = slug.contains("identite") || slug.contains("cin") || slug.contains("national-id");
+                if (topic == ChatQueryMatcher.TopicHint.PASSPORT) {
+                    if (isPassport) {
+                        entry.setValue(entry.getValue() + 80);
+                    } else if (isCin) {
+                        entry.setValue(entry.getValue() - 60);
+                    }
+                } else if (topic == ChatQueryMatcher.TopicHint.CIN) {
+                    if (isCin) {
+                        entry.setValue(entry.getValue() + 80);
+                    } else if (isPassport) {
+                        entry.setValue(entry.getValue() - 60);
+                    }
+                }
+            }
         }
 
         List<UUID> rankedIds = scores.entrySet().stream()

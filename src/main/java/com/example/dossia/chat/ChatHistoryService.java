@@ -60,22 +60,31 @@ public class ChatHistoryService {
         if (userId == null || sessionId == null || maxMessages <= 0) {
             return List.of();
         }
-        ChatSession session = requireSession(userId, sessionId);
-        List<ChatMessageEntity> messages = session.getMessages();
-        if (messages.isEmpty()) {
-            return List.of();
-        }
-        int from = Math.max(0, messages.size() - maxMessages);
-        return messages.subList(from, messages.size()).stream()
-                .map(message -> new ConversationTurn(
-                        message.getRole() == MessageRole.USER ? "user" : "model", message.getContent()))
-                .toList();
+        return sessionRepository
+                .findByIdAndUserId(sessionId, userId)
+                .map(session -> {
+                    List<ChatMessageEntity> messages = session.getMessages();
+                    if (messages.isEmpty()) {
+                        return List.<ConversationTurn>of();
+                    }
+                    int from = Math.max(0, messages.size() - maxMessages);
+                    return messages.subList(from, messages.size()).stream()
+                            .map(message -> new ConversationTurn(
+                                    message.getRole() == MessageRole.USER ? "user" : "model",
+                                    message.getContent()))
+                            .toList();
+                })
+                .orElseGet(List::of);
     }
 
     @Transactional
     public ChatSession resolveSession(UUID userId, UUID sessionId, String firstMessage) {
         if (sessionId != null) {
-            return requireSession(userId, sessionId);
+            var existing = sessionRepository.findByIdAndUserId(sessionId, userId);
+            if (existing.isPresent()) {
+                return existing.get();
+            }
+            // Stale / guest / foreign session id — start a fresh session instead of 404.
         }
         ChatSession session = new ChatSession();
         session.setUserId(userId);

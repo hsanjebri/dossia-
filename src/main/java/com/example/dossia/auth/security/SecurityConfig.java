@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.dossia.chat.GuestChatRateLimitFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -20,9 +21,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final GuestChatRateLimitFilter guestChatRateLimitFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            GuestChatRateLimitFilter guestChatRateLimitFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.guestChatRateLimitFilter = guestChatRateLimitFilter;
     }
 
     @Bean
@@ -39,6 +44,8 @@ public class SecurityConfig {
                         .authenticated()
                         .requestMatchers("/api/v1/chat/sessions/**")
                         .authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/chat/feedback")
+                        .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/chat")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/procedures/**", "/api/v1/offices/**", "/api/v1/health")
@@ -58,7 +65,8 @@ public class SecurityConfig {
                                     .trim();
                     response.getWriter().write(body);
                 }))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(guestChatRateLimitFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }

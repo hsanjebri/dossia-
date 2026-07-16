@@ -12,17 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProcedureEmbeddingExecutor {
 
     private final ProcedureRepository procedureRepository;
-    private final GeminiClient geminiClient;
+    private final LlmGateway llmGateway;
     private final ProcedureContextBuilder contextBuilder;
     private final ProcedureLoader procedureLoader;
 
     public ProcedureEmbeddingExecutor(
             ProcedureRepository procedureRepository,
-            GeminiClient geminiClient,
+            LlmGateway llmGateway,
             ProcedureContextBuilder contextBuilder,
             ProcedureLoader procedureLoader) {
         this.procedureRepository = procedureRepository;
-        this.geminiClient = geminiClient;
+        this.llmGateway = llmGateway;
         this.contextBuilder = contextBuilder;
         this.procedureLoader = procedureLoader;
     }
@@ -34,7 +34,7 @@ public class ProcedureEmbeddingExecutor {
             return;
         }
         String text = contextBuilder.toEmbeddingText(procedure);
-        float[] embedding = geminiClient.embed(text);
+        float[] embedding = llmGateway.embed(text);
         procedureRepository.updateEmbedding(procedure.getId(), VectorUtils.toPgVector(embedding));
     }
 }

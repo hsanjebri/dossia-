@@ -20,14 +20,16 @@ public class ChatQueryExpander {
             - Pas de guillemets, pas d'explication.
             """;
 
-    public Optional<String> expand(GeminiClient geminiClient, String message) {
-        if (message == null || message.strip().length() < 8) {
+    public Optional<String> expand(LlmGateway llmGateway, String message) {
+        if (message == null || message.strip().length() < 8 || !llmGateway.isChatConfigured()) {
             return Optional.empty();
         }
 
         String trimmed = message.strip();
         try {
-            String expanded = geminiClient.generate(SYSTEM_PROMPT, trimmed, 0.1);
+            String expanded = llmGateway
+                    .generate(SYSTEM_PROMPT, java.util.List.of(), trimmed, 0.1)
+                    .text();
             if (expanded.isBlank()) {
                 return Optional.empty();
             }

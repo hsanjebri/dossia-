@@ -38,3 +38,16 @@ dossia:
     embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
     retrieval-limit: ${GEMINI_RETRIEVAL_LIMIT:5}
     enabled: ${GEMINI_ENABLED:true}
+  # auto = Gemini if key works, else Ollama; set LLM_PROVIDER=ollama to force local
+  llm:
+    provider: ${LLM_PROVIDER:auto}
+  ollama:
+    enabled: ${OLLAMA_ENABLED:true}
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    chat-model: ${OLLAMA_CHAT_MODEL:qwen2.5:7b-instruct}
+    embedding-model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
+  chat:
+    rate-limit:
+      enabled: ${CHAT_RATE_LIMIT_ENABLED:true}
+      guest-max-requests: ${CHAT_GUEST_MAX_REQUESTS:30}
+      guest-window-seconds: ${CHAT_GUEST_WINDOW_SECONDS:3600}

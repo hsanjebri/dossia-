@@ -10,14 +10,15 @@ public record ChatResponse(
         String model,
         UUID sessionId,
         List<NearbyOfficeDto> nearbyOffices,
-        List<ChatSuggestionDto> suggestions) {
+        List<ChatSuggestionDto> suggestions,
+        List<ChatChecklistItemDto> checklist) {
 
     public ChatResponse(String answer, List<ChatSourceDto> sources, String model) {
-        this(answer, sources, model, null, List.of(), List.of());
+        this(answer, sources, model, null, List.of(), List.of(), List.of());
     }
 
     public ChatResponse(String answer, List<ChatSourceDto> sources, String model, UUID sessionId) {
-        this(answer, sources, model, sessionId, List.of(), List.of());
+        this(answer, sources, model, sessionId, List.of(), List.of(), List.of());
     }
 
     public ChatResponse(
@@ -26,6 +27,16 @@ public record ChatResponse(
             String model,
             UUID sessionId,
             List<NearbyOfficeDto> nearbyOffices) {
-        this(answer, sources, model, sessionId, nearbyOffices, List.of());
+        this(answer, sources, model, sessionId, nearbyOffices, List.of(), List.of());
+    }
+
+    public ChatResponse(
+            String answer,
+            List<ChatSourceDto> sources,
+            String model,
+            UUID sessionId,
+            List<NearbyOfficeDto> nearbyOffices,
+            List<ChatSuggestionDto> suggestions) {
+        this(answer, sources, model, sessionId, nearbyOffices, suggestions, List.of());
     }
 }

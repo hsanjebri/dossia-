@@ -5,6 +5,7 @@ import com.example.dossia.config.GeminiProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class GeminiClient {
     private final RestClient restClient;
     private final GeminiProperties properties;
 
-    public GeminiClient(RestClient geminiRestClient, GeminiProperties properties) {
+    public GeminiClient(@Qualifier("geminiRestClient") RestClient geminiRestClient, GeminiProperties properties) {
         this.restClient = geminiRestClient;
         this.properties = properties;
     }

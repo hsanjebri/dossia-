@@ -98,6 +98,16 @@
           <span class="material-symbols-outlined">record_voice_over</span>
           Vocal {{ voice.voiceMode() ? 'ON' : 'OFF' }}
         </button>
+        <button
+          type="button"
+          class="toolbar-btn"
+          [class.toolbar-btn--active]="!!selectedAgent"
+          (click)="changeAgent()"
+          title="Choisir un guide (Sofia / Yasmine / Alex)"
+        >
+          <span class="material-symbols-outlined">groups</span>
+          {{ selectedAgent ? selectedAgent.name : 'Choisir un guide' }}
+        </button>
       }
       @if (voice.isSpeaking()) {
         <button type="button" class="toolbar-btn" (click)="voice.stopSpeaking()">
@@ -123,10 +133,13 @@
     }
 
     <div class="messages" #messagesContainer>
-      @for (msg of messages; track $index) {
+      @for (msg of messages; track $index; let msgIdx = $index) {
         <div class="message" [class.message--user]="msg.role === 'user'">
           @if (msg.role === 'assistant') {
-            <div class="message__avatar">D</div>
+            <div
+              class="message__avatar"
+              [style.background]="selectedAgent?.accent || null"
+            >{{ selectedAgent?.monogram || 'D' }}</div>
           }
           <div class="message__bubble">
             @if (msg.role === 'assistant') {
@@ -138,6 +151,33 @@
               <button type="button" class="message__speak" (click)="speakMessage(msg.content)" title="Écouter">
                 <span class="material-symbols-outlined">volume_up</span>
               </button>
+            }
+            @if (msg.checklist?.length && !msg.streaming) {
+              <div class="checklist">
+                <p class="checklist__title">
+                  <span class="material-symbols-outlined">checklist</span>
+                  Documents à préparer
+                </p>
+                <ul class="checklist__list">
+                  @for (item of msg.checklist; track item.id) {
+                    <li>
+                      <label class="checklist__item" [class.checklist__item--done]="item.checked">
+                        <input
+                          type="checkbox"
+                          [checked]="item.checked"
+                          (change)="toggleChecklistItem(msgIdx, item.id)"
+                        />
+                        <span class="checklist__label">
+                          {{ item.label }}
+                          @if (item.hint) {
+                            <small>{{ item.hint }}</small>
+                          }
+                        </span>
+                      </label>
+                    </li>
+                  }
+                </ul>
+              </div>
             }
             @if (msg.sources?.length) {
               <div class="sources">
@@ -165,7 +205,7 @@
                 }
               </div>
             }
-            @if (msg.suggestions?.length && !msg.streaming && $index === messages.length - 1) {
+            @if (msg.suggestions?.length && !msg.streaming && msgIdx === messages.length - 1) {
               <div class="action-chips">
                 @for (chip of msg.suggestions; track chip.id) {
                   <button type="button" class="action-chip" (click)="useChip(chip.prompt)">
@@ -184,13 +224,28 @@
                 (officeSelected)="onOfficeSelected($event)"
               />
             }
+            @if (msg.role === 'assistant' && !msg.streaming && msg.content && msgIdx > 0) {
+              <div class="message__feedback">
+                @if (msg.feedbackSent) {
+                  <span class="message__feedback-done">Merci pour le signalement</span>
+                } @else {
+                  <button type="button" class="message__report" (click)="reportBadAnswer(msgIdx)">
+                    <span class="material-symbols-outlined">flag</span>
+                    Signaler
+                  </button>
+                }
+              </div>
+            }
           </div>
         </div>
       }
 
       @if (loading) {
         <div class="message message--typing" aria-live="polite" aria-label="Dosya is typing">
-          <div class="message__avatar">D</div>
+          <div
+            class="message__avatar"
+            [style.background]="selectedAgent?.accent || null"
+          >{{ selectedAgent?.monogram || 'D' }}</div>
           <div class="message__bubble message__bubble--typing">
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
@@ -216,12 +271,25 @@
         </div>
       }
       @if (voice.speechSupported) {
+        @if (selectedAgent) {
+          <button
+            type="button"
+            class="composer__agent"
+            [style.--agent-accent]="selectedAgent.accent"
+            (click)="changeAgent()"
+            [title]="'Changer d\'agent — ' + selectedAgent.name"
+          >
+            <span class="composer__agent-mono">{{ selectedAgent.monogram }}</span>
+            <span class="composer__agent-name">{{ selectedAgent.name }}</span>
+          </button>
+        }
         <button
           type="button"
           class="composer__mic"
           [class.composer__mic--active]="voice.isListening()"
+          [class.composer__mic--pick]="!selectedAgent"
           (click)="onVoiceInput()"
-          title="Parler"
+          [title]="selectedAgent ? 'Parler avec ' + selectedAgent.name : 'Choisir un agent vocal'"
           [disabled]="loading || isComposerLocked"
         >
           <span class="material-symbols-outlined">{{ voice.isListening() ? 'mic' : 'mic_none' }}</span>
@@ -231,7 +299,13 @@
         type="text"
         [(ngModel)]="input"
         name="message"
-        [placeholder]="isComposerLocked ? 'Créez un compte pour continuer…' : 'Posez votre question en français ou en arabe…'"
+        [placeholder]="
+          isComposerLocked
+            ? 'Créez un compte pour continuer…'
+            : selectedAgent
+              ? 'Parlez à ' + selectedAgent.name + '…'
+              : 'Posez votre question — ou choisissez un agent au micro…'
+        "
         [disabled]="loading || isComposerLocked"
         autocomplete="off"
       />
@@ -278,6 +352,119 @@
         <button type="button" class="auth-gate__dismiss" (click)="closeAuthGate()">
           Pas maintenant
         </button>
+      </div>
+    </div>
+  }
+
+  @if (showAgentPicker) {
+    <div
+      class="ps-select"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ps-select-title"
+      (keydown)="onAgentPickerKeydown($event)"
+      tabindex="0"
+    >
+      <div class="ps-select__bg" aria-hidden="true">
+        <div class="ps-select__beam"></div>
+        <div class="ps-select__particles">
+          @for (p of particleSlots; track p) {
+            <span [style.--i]="p"></span>
+          }
+        </div>
+      </div>
+
+      <button type="button" class="ps-select__dismiss" (click)="closeAgentPicker()" aria-label="Fermer">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div class="ps-select__stage">
+        <h2 id="ps-select-title">Welcome to Dosya Voice</h2>
+        <p class="ps-select__who">Who's guiding you today?</p>
+
+        <div class="ps-select__row">
+          @for (agent of agents; track agent.id) {
+            <button
+              type="button"
+              class="ps-avatar"
+              [class.ps-avatar--focused]="focusedAgentId === agent.id"
+              [style.--agent-accent]="agent.accent"
+              (mouseenter)="focusAgent(agent)"
+              (focus)="focusAgent(agent)"
+              (click)="confirmAgent(agent)"
+            >
+              <div class="ps-avatar__ring" aria-hidden="true"></div>
+              <div class="ps-avatar__face">
+                <span>{{ agent.monogram }}</span>
+              </div>
+              <strong class="ps-avatar__name">{{ agent.name }}</strong>
+              <span class="ps-avatar__meta">{{ agent.lang.toUpperCase() }} · {{ agent.tagline.split('·')[0].trim() }}</span>
+            </button>
+          }
+        </div>
+
+        <p class="ps-select__hint">
+          @if (focusedAgent; as agent) {
+            Tap <strong>{{ agent.name }}</strong> to join — {{ agent.tagline }}
+          }
+        </p>
+
+        <button type="button" class="ps-select__skip" (click)="closeAgentPicker()">Not now</button>
+      </div>
+    </div>
+  }
+
+  @if (voiceStageOpen && selectedAgent) {
+    <div class="voice-stage" [style.--agent-accent]="selectedAgent.accent" role="dialog" aria-modal="true">
+      <div class="voice-stage__bg" aria-hidden="true">
+        <div class="voice-stage__beam"></div>
+        <div class="voice-stage__particles">
+          @for (p of particleSlots; track p) {
+            <span [style.--i]="p"></span>
+          }
+        </div>
+      </div>
+
+      <button type="button" class="voice-stage__close" (click)="exitVoiceStage()" aria-label="Fermer le mode vocal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <button type="button" class="voice-stage__swap" (click)="changeAgent()" title="Changer de guide">
+        <span class="material-symbols-outlined">swap_horiz</span>
+        Change guide
+      </button>
+
+      <div class="voice-stage__center">
+        <p class="voice-stage__kicker">Dosya · {{ selectedAgent.name }}</p>
+        <p class="voice-stage__debug-line" aria-live="polite">
+          debug: listen={{ voice.isListening() }} speak={{ voice.isSpeaking() }} load={{ loading }}
+        </p>
+
+        <button
+          type="button"
+          class="voice-orb"
+          [class.voice-orb--listening]="voice.isListening()"
+          [class.voice-orb--thinking]="loading"
+          [class.voice-orb--speaking]="voice.isSpeaking()"
+          (click)="onVoiceOrbTap()"
+          [attr.aria-label]="voiceOrbLabel"
+        >
+          <span class="voice-orb__ripple voice-orb__ripple--1" aria-hidden="true"></span>
+          <span class="voice-orb__ripple voice-orb__ripple--2" aria-hidden="true"></span>
+          <span class="voice-orb__ripple voice-orb__ripple--3" aria-hidden="true"></span>
+          <span class="voice-orb__core">{{ selectedAgent.monogram }}</span>
+        </button>
+
+        <p class="voice-stage__status">{{ voiceOrbLabel }}</p>
+        @if (voice.lastError()) {
+          <p class="voice-stage__error">{{ voice.lastError() }}</p>
+          <pre class="voice-stage__debug">Open DevTools Console (F12) → filter: Dosya</pre>
+        } @else if (voiceInterim) {
+          <p class="voice-stage__caption" [attr.dir]="selectedAgent.lang === 'ar' || selectedAgent.lang === 'tn' ? 'rtl' : 'ltr'">
+            {{ voiceInterim }}
+          </p>
+        } @else {
+          <p class="voice-stage__sub">{{ selectedAgent.tagline }}</p>
+        }
       </div>
     </div>
   }

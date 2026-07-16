@@ -10,13 +10,23 @@ public record ChatRequest(
         UUID sessionId,
         Double latitude,
         Double longitude,
-        List<@Valid ChatHistoryTurnDto> history) {
+        List<@Valid ChatHistoryTurnDto> history,
+        String agentId) {
 
     public ChatRequest(String message) {
-        this(message, null, null, null, null);
+        this(message, null, null, null, null, null);
     }
 
     public ChatRequest(String message, UUID sessionId, Double latitude, Double longitude) {
-        this(message, sessionId, latitude, longitude, null);
+        this(message, sessionId, latitude, longitude, null, null);
+    }
+
+    public ChatRequest(
+            String message,
+            UUID sessionId,
+            Double latitude,
+            Double longitude,
+            List<@Valid ChatHistoryTurnDto> history) {
+        this(message, sessionId, latitude, longitude, history, null);
     }
 }

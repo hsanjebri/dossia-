@@ -6,6 +6,13 @@ export interface ChatSuggestion {
   prompt: string;
 }
 
+export interface ChatChecklistItem {
+  id: string;
+  label: string;
+  hint?: string;
+  checked?: boolean;
+}
+
 export interface ChatSource {
   id: string;
   slug: string;
@@ -24,6 +31,7 @@ export interface ChatResponse {
   sessionId: string | null;
   nearbyOffices: NearbyOffice[];
   suggestions?: ChatSuggestion[];
+  checklist?: ChatChecklistItem[];
 }
 
 export interface ChatMessage {
@@ -32,7 +40,9 @@ export interface ChatMessage {
   sources?: ChatSource[];
   nearbyOffices?: NearbyOffice[];
   suggestions?: ChatSuggestion[];
+  checklist?: ChatChecklistItem[];
   streaming?: boolean;
+  feedbackSent?: boolean;
 }
 
 export interface ChatSessionSummary {

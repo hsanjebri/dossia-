@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-dossia}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dossia}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - dossia_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -16,5 +16,25 @@ services:
       timeout: 5s
       retries: 5
 
+  # Local / self-hosted LLM (OpenAI-compatible API on :11434)
+  # After first start:  .\scripts\pull-ollama-models.ps1
+  ollama:
+    image: ollama/ollama:latest
+    container_name: dossia-ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - dossia_ollama:/root/.ollama
+    restart: unless-stopped
+    # Uncomment if you have an NVIDIA GPU + NVIDIA Container Toolkit:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
 volumes:
   dossia_pgdata:
+  dossia_ollama:

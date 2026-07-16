@@ -4,6 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../core/auth/auth.service';
+import {
+  AGENT_STORAGE_KEY,
+  CHAT_AGENTS,
+  ChatAgent,
+  findChatAgent,
+} from '../../core/models/chat-agent.model';
 import { ChatMessage, ChatSessionSummary } from '../../core/models/chat.model';
 import { NearbyOffice, RouteInfo } from '../../core/models/office.model';
 import { ChatApiService } from '../../core/services/chat-api.service';
@@ -51,6 +57,19 @@ export class ChatComponent implements OnInit, OnDestroy {
   guestPromptCount = 0;
   showAuthGate = false;
 
+  readonly agents = CHAT_AGENTS;
+  readonly particleSlots = Array.from({ length: 28 }, (_, i) => i + 1);
+  selectedAgent: ChatAgent | null = null;
+  showAgentPicker = false;
+  voiceStageOpen = false;
+  voiceUserLine = '';
+  voiceAgentLine = '';
+  voiceInterim = '';
+  focusedAgentId: ChatAgent['id'] | null = null;
+  private listenAfterAgentPick = false;
+  private skipVoiceAutoListen = false;
+  private voiceNeedsGreeting = true;
+
   readonly guestPromptLimit = GUEST_PROMPT_LIMIT;
 
   readonly suggestions = [
@@ -67,6 +86,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    this.selectedAgent = this.loadStoredAgent();
+    this.focusedAgentId = this.selectedAgent?.id ?? 'sofia';
+
     this.route.queryParamMap.subscribe((params) => {
       const q = params.get('q');
       if (q) this.input = q;
@@ -109,6 +131,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.voice.stopListening();
     this.voice.stopSpeaking();
+    this.voiceStageOpen = false;
   }
 
   get guestRemaining(): number {
@@ -144,14 +167,19 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   async send(): Promise<void> {
     const text = this.input.trim();
-    if (!text || this.loading) return;
+    if (!text || this.loading) {
+      console.warn('[Dosya voice] send skipped', { text, loading: this.loading });
+      return;
+    }
 
     if (this.isComposerLocked) {
+      console.warn('[Dosya voice] composer locked → auth gate');
       this.showAuthGate = true;
       return;
     }
 
-    if (!this.locationEnabled && !this.geo.location()) {
+    // Never block voice on the location permission dialog.
+    if (!this.voiceStageOpen && !this.locationEnabled && !this.geo.location()) {
       await this.enableLocation();
     }
 
@@ -162,64 +190,176 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.input = '';
     this.loading = true;
     this.error = '';
+    this.voice.lastError.set('');
     this.selectedOffice = null;
     this.activeRoute = null;
-    this.scrollToBottom();
+    if (this.voiceStageOpen) {
+      this.voiceUserLine = text;
+      this.voiceAgentLine = '';
+      this.voiceInterim = '';
+    } else {
+      this.scrollToBottom();
+    }
 
-    const lang = this.detectLang(text, historyPayload);
-    const speakLang = lang === 'en' ? 'en-US' : lang === 'ar' ? 'ar-TN' : 'fr-FR';
+    const lang = this.selectedAgent?.lang ?? this.detectLang(text, historyPayload);
+    const speakLang = this.selectedAgent?.speechLang
+      ?? (lang === 'en' ? 'en-US' : lang === 'ar' || lang === 'tn' ? 'ar' : 'fr-FR');
 
-    this.chatApi
-      .ask(text, this.currentSessionId, loc?.lat, loc?.lng, lang, historyPayload)
-      .subscribe({
-        next: (response) => {
-          if (!this.auth.isLoggedIn()) {
-            this.incrementGuestPromptCount();
-          }
+    // Guests must not send localStorage session UUIDs — backend treats them as real sessions → 404.
+    // Also wipe a known-stale id before first voice ask.
+    let apiSessionId = this.auth.isLoggedIn() ? this.currentSessionId : null;
 
-          if (response.sessionId) {
-            this.currentSessionId = response.sessionId;
-          } else if (!this.auth.isLoggedIn()) {
-            this.currentSessionId = this.history.persistLocalExchange(
-              this.currentSessionId,
-              text,
-              response.answer,
-              response.sources,
-            );
-          }
+    const postChat = (sessionId: string | null, isRetry = false) => {
+      const payload = {
+        message: text,
+        sessionId,
+        lat: this.voiceStageOpen ? null : loc?.lat ?? null,
+        lng: this.voiceStageOpen ? null : loc?.lng ?? null,
+        lang,
+        speakLang,
+        agentId: this.selectedAgent?.id ?? null,
+        historyLen: historyPayload.length,
+        voiceStageOpen: this.voiceStageOpen,
+        loggedIn: this.auth.isLoggedIn(),
+        isRetry,
+      };
+      console.log('[Dosya voice] → POST /chat', payload);
 
-          this.loading = false;
-          const assistantIndex =
-            this.messages.push({
-              role: 'assistant',
-              content: '',
-              sources: response.sources,
-              nearbyOffices: response.nearbyOffices ?? [],
-              suggestions: response.suggestions ?? [],
-              streaming: true,
-            }) - 1;
+      this.chatApi
+        .ask(
+          text,
+          sessionId,
+          this.voiceStageOpen ? null : loc?.lat,
+          this.voiceStageOpen ? null : loc?.lng,
+          lang,
+          historyPayload,
+          this.selectedAgent?.id ?? null,
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('[Dosya voice] ← /chat OK', {
+              answerLen: response?.answer?.length ?? 0,
+              answerPreview: (response?.answer ?? '').slice(0, 120),
+              sessionId: response?.sessionId,
+              sources: response?.sources?.length ?? 0,
+              model: response?.model,
+            });
+            try {
+              if (!this.auth.isLoggedIn()) {
+                this.incrementGuestPromptCount();
+              }
 
-          void this.revealAnswer(assistantIndex, response.answer).then(() => {
-            this.loadHistory();
-            this.scrollToBottom();
-            if (this.voice.voiceMode()) {
-              this.voice.speak(response.answer, speakLang);
+              if (response.sessionId) {
+                this.currentSessionId = response.sessionId;
+              } else if (!this.auth.isLoggedIn()) {
+                this.currentSessionId = this.history.persistLocalExchange(
+                  this.currentSessionId,
+                  text,
+                  response.answer,
+                  response.sources,
+                );
+              }
+
+              this.loading = false;
+              this.voice.lastError.set('');
+              const inVoice = this.voiceStageOpen;
+              const assistantIndex =
+                this.messages.push({
+                  role: 'assistant',
+                  content: inVoice ? response.answer : '',
+                  sources: response.sources ?? [],
+                  nearbyOffices: response.nearbyOffices ?? [],
+                  suggestions: response.suggestions ?? [],
+                  checklist: (response.checklist ?? []).map((item) => ({ ...item, checked: false })),
+                  streaming: !inVoice,
+                }) - 1;
+
+              if (inVoice) {
+                this.voiceAgentLine = response.answer;
+                console.log('[Dosya voice] speaking answer…', { speakLang, inVoice });
+                this.voice.unlockAudio();
+                this.voice.speak(
+                  response.answer,
+                  speakLang,
+                  () => {
+                    console.log('[Dosya voice] answer speech ended → listen again');
+                    if (this.voiceStageOpen && !this.skipVoiceAutoListen && !this.isComposerLocked) {
+                      setTimeout(() => this.beginVoiceListen(), 500);
+                    }
+                    this.skipVoiceAutoListen = false;
+                  },
+                  false,
+                );
+                if (this.isComposerLocked) {
+                  this.showAuthGate = true;
+                }
+                return;
+              }
+
+              void this.revealAnswer(assistantIndex, response.answer).then(() => {
+                this.loadHistory();
+                this.scrollToBottom();
+                if (this.voice.voiceMode()) {
+                  this.voice.speak(response.answer, speakLang);
+                }
+                if (this.isComposerLocked) {
+                  this.showAuthGate = true;
+                }
+              });
+            } catch (e) {
+              console.error('[Dosya voice] client crash after OK response', e);
+              this.loading = false;
+              this.recoverVoiceAfterError(
+                e instanceof Error ? e.message : 'Unexpected client error after reply.',
+              );
             }
-            if (this.isComposerLocked) {
-              this.showAuthGate = true;
+          },
+          error: (err: HttpErrorResponse) => {
+            console.error('[Dosya voice] ← /chat FAIL', {
+              status: err.status,
+              statusText: err.statusText,
+              url: err.url,
+              message: err.message,
+              errorBody: err.error,
+              isRetry,
+            });
+            const bodyMsg =
+              typeof err.error === 'string'
+                ? err.error
+                : (err.error?.message as string | undefined);
+            const isMissingSession =
+              err.status === 404 &&
+              typeof bodyMsg === 'string' &&
+              bodyMsg.toLowerCase().includes('session');
+
+            // Silent auto-retry once without the bad session id.
+            if (isMissingSession && !isRetry) {
+              console.warn('[Dosya voice] stale session → retry with sessionId=null', sessionId);
+              this.currentSessionId = null;
+              postChat(null, true);
+              return;
             }
-          });
-        },
-        error: (err: HttpErrorResponse) => {
-          this.loading = false;
-          if (this.messages.at(-1)?.role === 'user' && this.messages.at(-1)?.content === text) {
-            this.messages.pop();
-          }
-          this.error =
-            err.error?.message ??
-            'Erreur lors de la communication avec l\'assistant. Réessayez dans un instant.';
-        },
-      });
+
+            this.loading = false;
+            if (this.messages.at(-1)?.role === 'user' && this.messages.at(-1)?.content === text) {
+              this.messages.pop();
+            }
+            if (err.status === 404 && this.currentSessionId) {
+              this.currentSessionId = null;
+            }
+            const msg =
+              err.status === 429
+                ? 'Too many requests. Sign in or try again later.'
+                : err.status === 0
+                  ? 'Cannot reach the server. Is the backend running on :8080?'
+                  : (bodyMsg ?? `Error ${err.status || 'network'} — ${err.statusText || err.message}`);
+            this.recoverVoiceAfterError(msg);
+            this.error = msg;
+          },
+        });
+    };
+
+    postChat(apiSessionId);
   }
 
   useChip(prompt: string): void {
@@ -300,19 +440,297 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
+  get focusedAgent(): ChatAgent | null {
+    return findChatAgent(this.focusedAgentId);
+  }
+
+  get voiceOrbLabel(): string {
+    if (this.voice.isSpeaking()) return `${this.selectedAgent?.name ?? 'Dosya'} is speaking…`;
+    if (this.loading) return `${this.selectedAgent?.name ?? 'Dosya'} is thinking…`;
+    if (this.voice.isListening()) {
+      return this.voiceInterim
+        ? `Heard: “${this.voiceInterim.slice(0, 60)}${this.voiceInterim.length > 60 ? '…' : ''}”`
+        : 'Listening… speak now';
+    }
+    return 'Tap to talk';
+  }
+
+  exitVoiceStage(): void {
+    this.skipVoiceAutoListen = true;
+    this.voiceStageOpen = false;
+    this.voiceInterim = '';
+    this.voiceNeedsGreeting = true;
+    this.voice.stopListening();
+    this.voice.stopSpeaking();
+  }
+
+  onVoiceOrbTap(): void {
+    if (this.loading) return;
+    if (this.voice.isSpeaking()) {
+      this.skipVoiceAutoListen = true;
+      this.voice.stopSpeaking();
+      return;
+    }
+    // Tap while listening = SEND what was heard (don't discard).
+    if (this.voice.isListening()) {
+      this.voice.commitListening();
+      return;
+    }
+    this.startVoiceWithAgent(false);
+  }
+
   onVoiceInput(): void {
     if (this.isComposerLocked) {
       this.showAuthGate = true;
       return;
     }
-    this.voice.toggleListening((transcript) => {
-      this.input = transcript;
-      void this.send();
-    });
+    if (this.voice.isListening()) {
+      this.voice.commitListening();
+      return;
+    }
+    if (!this.selectedAgent) {
+      this.listenAfterAgentPick = true;
+      this.openAgentPicker();
+      return;
+    }
+    // Returning to voice with an already chosen guide → greet again.
+    this.voiceNeedsGreeting = true;
+    this.voiceStageOpen = true;
+    this.startVoiceWithAgent(true);
+  }
+
+  confirmAgent(agent: ChatAgent): void {
+    this.selectedAgent = agent;
+    this.focusedAgentId = agent.id;
+    this.persistAgent(agent);
+    this.showAgentPicker = false;
+    this.listenAfterAgentPick = false;
+    this.voiceStageOpen = true;
+    this.voiceNeedsGreeting = true;
+    this.skipVoiceAutoListen = false;
+    this.voiceInterim = '';
+    this.voiceUserLine = '';
+    this.voiceAgentLine = '';
+    this.error = '';
+    // Voice chats should not inherit a stale sidebar/guest session id.
+    if (this.auth.isLoggedIn()) {
+      // Keep only if we'll create a fresh one after first successful answer.
+      this.currentSessionId = null;
+    }
+    if (!this.voice.voiceMode()) {
+      this.voice.toggleVoiceMode();
+    }
+
+    // CRITICAL: unlock + greet in THIS click stack (Chrome blocks delayed speech).
+    this.voice.unlockAudio();
+    const greet = this.agentGreeting(agent);
+    this.voiceNeedsGreeting = false;
+    this.voice.speak(
+      greet,
+      agent.speechLang,
+      () => {
+        if (this.voiceStageOpen && !this.skipVoiceAutoListen) {
+          this.beginVoiceListen();
+        }
+      },
+      true,
+    );
+  }
+
+  changeAgent(): void {
+    this.listenAfterAgentPick = false;
+    this.skipVoiceAutoListen = true;
+    this.voiceNeedsGreeting = true;
+    this.voice.stopListening();
+    this.voice.stopSpeaking();
+    this.openAgentPicker();
+  }
+
+  private startVoiceWithAgent(forceGreeting = false): void {
+    this.voiceStageOpen = true;
+    this.skipVoiceAutoListen = false;
+    this.voiceInterim = '';
+    this.voice.unlockAudio();
+
+    const agent = this.selectedAgent;
+    if (!agent) return;
+
+    if (forceGreeting || this.voiceNeedsGreeting) {
+      this.voiceNeedsGreeting = false;
+      this.voiceUserLine = '';
+      this.voiceAgentLine = '';
+      this.voice.speak(
+        this.agentGreeting(agent),
+        agent.speechLang,
+        () => {
+          if (this.voiceStageOpen && !this.skipVoiceAutoListen) {
+            this.beginVoiceListen();
+          }
+        },
+        true,
+      );
+      return;
+    }
+
+    this.beginVoiceListen();
+  }
+
+  private beginVoiceListen(): void {
+    const agent = this.selectedAgent;
+    if (!agent || !this.voiceStageOpen) {
+      console.warn('[Dosya voice] beginVoiceListen skipped', {
+        agent: agent?.id,
+        voiceStageOpen: this.voiceStageOpen,
+      });
+      return;
+    }
+    console.log('[Dosya voice] startListening', { agent: agent.id, lang: agent.speechLang });
+    this.voice.startListening(
+      (transcript) => {
+        console.log('[Dosya voice] final transcript', transcript);
+        this.voiceInterim = '';
+        this.voiceUserLine = transcript;
+        this.input = transcript;
+        void this.send();
+      },
+      agent.speechLang,
+      (interim) => {
+        this.voiceInterim = interim;
+      },
+    );
+  }
+
+  private recoverVoiceAfterError(message: string): void {
+    console.error('[Dosya voice] recover after error', message);
+    this.voice.lastError.set(message);
+    if (!this.voiceStageOpen) return;
+    this.voiceAgentLine = '';
+    const apology =
+      this.selectedAgent?.id === 'yasmine'
+        ? 'سامحني، صار مشكل. عاود قولّي شنوة تحب.'
+        : this.selectedAgent?.id === 'alex'
+          ? "Sorry, something went wrong. Please say that again."
+          : "Désolé, une erreur est survenue. Reprenez votre question.";
+    this.voice.unlockAudio();
+    this.voice.speak(
+      apology,
+      this.selectedAgent?.speechLang ?? 'fr-FR',
+      () => {
+        if (this.voiceStageOpen && !this.isComposerLocked) {
+          setTimeout(() => this.beginVoiceListen(), 400);
+        }
+      },
+      false,
+    );
+  }
+
+  private agentGreeting(agent: ChatAgent): string {
+    switch (agent.id) {
+      case 'yasmine':
+        return 'عسلامة، أنا ياسمين. شنوة تحب؟';
+      case 'alex':
+        return "Hi, I'm Alex. How can I help you today?";
+      case 'sofia':
+        return 'Bonjour, je suis Sofia. Comment puis-je vous aider ?';
+    }
+  }
+
+  openAgentPicker(): void {
+    this.focusedAgentId = this.selectedAgent?.id ?? this.focusedAgentId ?? 'sofia';
+    this.showAgentPicker = true;
+    setTimeout(() => {
+      const el = document.querySelector('.ps-select') as HTMLElement | null;
+      el?.focus();
+    }, 50);
+  }
+
+  closeAgentPicker(): void {
+    this.showAgentPicker = false;
+    this.listenAfterAgentPick = false;
+  }
+
+  focusAgent(agent: ChatAgent): void {
+    this.focusedAgentId = agent.id;
+  }
+
+  onAgentPickerKeydown(event: KeyboardEvent): void {
+    const ids = this.agents.map((a) => a.id);
+    const idx = ids.indexOf(this.focusedAgentId ?? 'sofia');
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.focusedAgentId = ids[(idx + 1) % ids.length];
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.focusedAgentId = ids[(idx - 1 + ids.length) % ids.length];
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      const agent = findChatAgent(this.focusedAgentId);
+      if (agent) this.confirmAgent(agent);
+    } else if (event.key === 'Escape') {
+      this.closeAgentPicker();
+    }
   }
 
   speakMessage(content: string): void {
-    this.voice.speak(content, this.detectVoiceLang(content));
+    const lang = this.selectedAgent?.speechLang ?? this.detectVoiceLang(content);
+    this.voice.speak(content, lang);
+  }
+
+  private loadStoredAgent(): ChatAgent | null {
+    try {
+      return findChatAgent(localStorage.getItem(AGENT_STORAGE_KEY));
+    } catch {
+      return null;
+    }
+  }
+
+  private persistAgent(agent: ChatAgent): void {
+    try {
+      localStorage.setItem(AGENT_STORAGE_KEY, agent.id);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  toggleChecklistItem(msgIndex: number, itemId: string): void {
+    const msg = this.messages[msgIndex];
+    if (!msg?.checklist) return;
+    const item = msg.checklist.find((c) => c.id === itemId);
+    if (item) {
+      item.checked = !item.checked;
+    }
+  }
+
+  reportBadAnswer(msgIndex: number): void {
+    const msg = this.messages[msgIndex];
+    if (!msg || msg.role !== 'assistant' || msg.feedbackSent) return;
+
+    const reason = window.prompt(
+      'Pourquoi cette réponse est incorrecte ou inutile ? (court commentaire)',
+      'Réponse incorrecte ou incomplète',
+    );
+    if (!reason?.trim()) return;
+
+    const priorUser = [...this.messages]
+      .slice(0, msgIndex)
+      .reverse()
+      .find((m) => m.role === 'user');
+
+    this.chatApi
+      .reportFeedback({
+        sessionId: this.currentSessionId,
+        userMessage: priorUser?.content,
+        assistantAnswer: msg.content,
+        reason: reason.trim(),
+      })
+      .subscribe({
+        next: () => {
+          msg.feedbackSent = true;
+        },
+        error: () => {
+          this.error = 'Impossible d\'envoyer le signalement. Réessayez.';
+        },
+      });
   }
 
   private async revealAnswer(index: number, full: string): Promise<void> {

@@ -24,7 +24,8 @@ if (Test-Path $envFile) {
 if (-not $env:GEMINI_API_KEY) {
   Write-Warning "GEMINI_API_KEY is empty"
 } else {
-  Write-Host "GEMINI_API_KEY: set ($($env:GEMINI_API_KEY.Length) chars)"
+  $keyLen = $env:GEMINI_API_KEY.Length
+  Write-Host "GEMINI_API_KEY: set ($keyLen chars)"
 }
 
 $env:SPRING_PROFILES_ACTIVE = if ($env:SPRING_PROFILES_ACTIVE) { $env:SPRING_PROFILES_ACTIVE } else { "local" }

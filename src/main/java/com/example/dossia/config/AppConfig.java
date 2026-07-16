@@ -6,7 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties({AuthProperties.class, GeminiProperties.class})
+@EnableConfigurationProperties({
+    AuthProperties.class,
+    GeminiProperties.class,
+    OllamaProperties.class,
+    LlmProperties.class,
+    ChatRateLimitProperties.class
+})
 public class AppConfig {
 
     @Bean
