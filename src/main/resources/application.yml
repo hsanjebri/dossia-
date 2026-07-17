@@ -4,9 +4,10 @@ spring:
   config:
     import: optional:classpath:application-local.yml,optional:file:.env[.properties]
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dossia}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:}
+    # Prefer SPRING_DATASOURCE_* / DATABASE_URL (Railway). Fallback: POSTGRES_* (local / Docker).
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dossia}}
+    username: ${SPRING_DATASOURCE_USERNAME:${POSTGRES_USER:postgres}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD:}}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -20,17 +21,20 @@ spring:
     locations: classpath:db/migration
 
 server:
-  port: 8080
+  # Railway injects PORT at runtime
+  port: ${PORT:8080}
 
 dossia:
   cors:
-    allowed-origins: http://localhost:4200
+    # Comma-separated. Add your Vercel URL in production.
+    allowed-origins: ${DOSSIA_CORS_ORIGINS:http://localhost:4200}
   auth:
     jwt-secret: ${JWT_SECRET:dosya-local-dev-secret-change-in-production-min-32-chars}
     jwt-expiration-ms: ${JWT_EXPIRATION_MS:86400000}
     cookie-name: dossia_access_token
+    # Cross-site (Vercel → Railway): AUTH_COOKIE_SECURE=true + AUTH_COOKIE_SAME_SITE=None
     cookie-secure: ${AUTH_COOKIE_SECURE:false}
-    cookie-same-site: Lax
+    cookie-same-site: ${AUTH_COOKIE_SAME_SITE:Lax}
     admin-emails: ${ADMIN_EMAILS:}
   gemini:
     api-key: ${GEMINI_API_KEY:}
@@ -38,11 +42,11 @@ dossia:
     embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
     retrieval-limit: ${GEMINI_RETRIEVAL_LIMIT:5}
     enabled: ${GEMINI_ENABLED:true}
-  # auto = Gemini if key works, else Ollama; set LLM_PROVIDER=ollama to force local
+  # auto = Gemini if key works, else Ollama; on Railway use LLM_PROVIDER=gemini
   llm:
     provider: ${LLM_PROVIDER:auto}
   ollama:
-    enabled: ${OLLAMA_ENABLED:true}
+    enabled: ${OLLAMA_ENABLED:false}
     base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
     chat-model: ${OLLAMA_CHAT_MODEL:qwen2.5:7b-instruct}
     embedding-model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
